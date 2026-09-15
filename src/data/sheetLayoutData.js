@@ -551,21 +551,21 @@ export const sheetLayoutData = [
     sheetNumber: 24,
     zone: 'Zone 4: Bedroom 3 (SW)',
     room: 'Bedroom 3 (SW)',
-    status: 'full',
-    shapeType: 'Full 4×8 Factory Sheet',
-    dimsText: '48" × 96" (4\' × 8\')',
-    cutDimensions: 'No cut required - factory full 4x8 sheet',
-    offcut: 'None',
-    position: 'Row 2, Center section of Bedroom 3',
+    status: 'cut',
+    shapeType: 'Stagger Starter (4×4)',
+    dimsText: '48" × 48" (4\' × 4\')',
+    cutDimensions: 'Cross-cut full 8ft sheet in half at 48" to establish a 48" stagger offset from Row 1 and Row 3',
+    offcut: '48" × 48" half-sheet (used on Raw Sheet #17 to produce Piece #27)',
+    position: 'Row 2, Starter piece along North room line (Z: -0.65)',
     polygon: [
       [-10.35, -0.65],
       [-6.35, -0.65],
-      [-6.35, 7.35],
-      [-10.35, 7.35]
+      [-6.35, 3.35],
+      [-10.35, 3.35]
     ],
-    notes: 'Center field of Bedroom 3. 48" offset stagger with Row 1.',
+    notes: 'Eliminates aligned seams! Staggers the end joint at Z: 3.35 by 48" from Row 1 (Sheet #22 seam at Z: 7.35) and Row 3 (Sheet #26 seam at Z: 7.35). Zero cross-joints.',
     staggerOffset: '48" offset',
-    fastenersCount: 82
+    fastenersCount: 46
   },
   {
     id: 'sheet-25',
@@ -575,21 +575,21 @@ export const sheetLayoutData = [
     room: 'Bedroom 3 (South Span)',
     status: 'cut',
     shapeType: 'Irregular Notch South Span',
-    dimsText: '48" × 44.0" (4\' × 3\'8")',
-    cutDimensions: 'Cross-cut length to 44.0", notch 10" return along closet wall to match Sheet #23 boundary with zero overlap',
-    offcut: 'Minimal scrap',
-    position: 'Row 2 South section to south exterior wall',
+    dimsText: '48" × 92.0" max (4\' × 7\'8")',
+    cutDimensions: 'Cross-cut length to 92.0" (7\'8"), notch 10.1" return along closet wall (Z: 9.12 to 11.02) to match Sheet #23 boundary with zero overlap',
+    offcut: '4" × 48" end strip + 10.1" × 22.8" notch offcut',
+    position: 'Row 2, from Z: 3.35 down to South exterior wall (Z: 11.02)',
     polygon: [
-      [-10.35, 7.35],
-      [-6.35, 7.35],
+      [-10.35, 3.35],
+      [-6.35, 3.35],
       [-6.35, 9.12],
       [-7.19, 9.12],
       [-7.19, 11.02],
       [-10.35, 11.02]
     ],
-    notes: 'Fits within 4x8 bounds (4.0\' × 3.67\'). Aligns perfectly against Sheet #23 with zero overlaps and zero gaps.',
+    notes: 'Fits within a standard 4x8 sheet (4.0\' × 7.67\' = 48" × 92.0" <= 96"). Seam with Sheet #24 is at Z: 3.35, creating a 48" stagger from Row 1 and Row 3. Aligns flush against Sheet #23 with zero overlap.',
     staggerOffset: '48" offset',
-    fastenersCount: 56
+    fastenersCount: 78
   },
   {
     id: 'sheet-26',

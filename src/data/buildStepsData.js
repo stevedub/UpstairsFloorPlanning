@@ -540,19 +540,19 @@ export const roomBuildGuides = [
           {
             id: 'baby-ply-03',
             title: 'Install Piece #24 (48" × 48" stagger starter) for Row 2',
-            desc: 'Half-sheet starter creates 48" stagger offset from Sheet #22.',
+            desc: 'Cross-cut 48" off a raw sheet to create a 48" × 48" half-sheet starter along North line (z = -0.65 to 3.35). Offsets Row 2 end joint by 48" from Row 1 (Sheet #22 at z = 7.35) and Row 3 (Sheet #26 at z = 7.35), completely eliminating aligned seams.',
             crucial: true
           },
           {
             id: 'baby-ply-04',
-            title: 'Install Piece #25 (48" × 84.4") completing Row 2',
-            desc: 'Cross-cut sheet to 84.4" to finish Row 2 toward south wall. Maintain 1/8" expansion gaps.',
-            crucial: false
+            title: 'Install Piece #25 (48" × 92.0" max notched) completing Row 2',
+            desc: 'Cross-cut sheet to 92.0" length (z = 3.35 to 11.02) and notch 10.1" along south closet return (z = 9.12 to 11.02) to finish Row 2 toward south wall. Mates flush with Sheet #23 with zero overlap.',
+            crucial: true
           },
           {
             id: 'baby-ply-05',
             title: 'Install Row 3 along West exterior wall (Pieces #26 & #27)',
-            desc: 'Piece #26 (28.4" × 96") and Piece #27 (28.4" × 36.4") complete bedroom floor along front wall.',
+            desc: 'Piece #26 (28.4" × 96", seam at z = 7.35) and Piece #27 (28.4" × 44.0") complete bedroom floor along west window wall with a 48" stagger from Row 2.',
             crucial: false
           },
           {

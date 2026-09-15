@@ -384,53 +384,53 @@ export const rawSheetNestingData = [
   },
   {
     rawSheetNum: 16,
-    status: 'full',
-    title: 'Raw Sheet #16 (Factory Full)',
+    status: 'cut',
+    title: 'Raw Sheet #16 (Bed 3 Row 2 Completion)',
     allocatedZone: 'Zone 4: Bedroom 3 (SW)',
-    sheetRole: 'Bedroom 3 Row 2 Center Field',
-    piecesProduced: [
-      {
-        stepNumber: 24,
-        pieceId: 'sheet-24',
-        room: 'Bedroom 3 (SW)',
-        size: '48" × 96" (4\' × 8\')',
-        shape: 'Full Factory Sheet',
-        cutDescription: 'No cutting required. Center field of Bedroom 3 with 48" stagger offset from Row 1.'
-      }
-    ],
-    efficiencyPercent: 100,
-    usedSqFt: 32.0,
-    wasteSqFt: 0.0,
-    offcutNotes: 'Zero waste. 100% sheet utilization.'
-  },
-  {
-    rawSheetNum: 17,
-    status: 'multi-cut',
-    title: 'Raw Sheet #17 (Bed 3 South Span & SW Finish)',
-    allocatedZone: 'Zone 4: Bedroom 3 (SW)',
-    sheetRole: 'Bedroom 3 Row 2 South Span & SW Corner Finish',
+    sheetRole: 'Bedroom 3 Row 2 Completion & South Span',
     piecesProduced: [
       {
         stepNumber: 25,
         pieceId: 'sheet-25',
-        room: 'Bedroom 3 South Span',
-        size: '48" × 44.0" (4\' × 3\'8")',
+        room: 'Bedroom 3 (South Span)',
+        size: '48" × 92.0" max (4\' × 7\'8")',
         shape: 'Notched South Span',
-        cutDescription: 'Cross-cut 44.0" length, notch 10" return along closet wall to match Sheet #23 boundary.'
+        cutDescription: 'Cross-cut length to 92.0" (cutting off 4.0" end strip), then notch 10.1" return along closet wall from Z: 9.12 to 11.02 to mate flush with Sheet #23.'
+      }
+    ],
+    efficiencyPercent: 88,
+    usedSqFt: 28.1,
+    wasteSqFt: 3.9,
+    offcutNotes: '4" × 48" end strip + 10.1" × 22.8" notch offcut (clean usable backing/shims).'
+  },
+  {
+    rawSheetNum: 17,
+    status: 'multi-cut',
+    title: 'Raw Sheet #17 (Stagger Starter #24 & SW Corner Finish #27)',
+    allocatedZone: 'Zone 4: Bedroom 3 (SW)',
+    sheetRole: 'Bedroom 3 Row 2 Stagger Starter & Row 3 SW Corner Finish',
+    piecesProduced: [
+      {
+        stepNumber: 24,
+        pieceId: 'sheet-24',
+        room: 'Bedroom 3 (SW Starter)',
+        size: '48" × 48" (4\' × 4\')',
+        shape: '4×4 Stagger Starter',
+        cutDescription: 'Cross-cut 48" off the 8ft sheet to yield the 48" × 48" starter piece that offsets Row 2 by 48" from Row 1 and Row 3.'
       },
       {
         stepNumber: 27,
         pieceId: 'sheet-27',
-        room: 'Bedroom 3 SW Finish',
+        room: 'Bedroom 3 (SW Corner Finish)',
         size: '28.4" × 44.0" (2\'4.4" × 3\'8")',
         shape: 'SW Corner Finish',
-        cutDescription: 'Cut 28.4" × 44.0" from the remaining 52" length of this sheet to finish SW bedroom corner.'
+        cutDescription: 'Cut 28.4" × 44.0" from the remaining 48" × 48" half of this sheet to finish the South-West corner of Bedroom 3.'
       }
     ],
-    efficiencyPercent: 73,
-    usedSqFt: 23.3,
-    wasteSqFt: 8.7,
-    offcutNotes: 'Length math: 44.0" + 44.0" = 88.0" <= 96"! Both pieces fit sequentially on ONE 4x8 sheet.'
+    efficiencyPercent: 77,
+    usedSqFt: 24.7,
+    wasteSqFt: 7.3,
+    offcutNotes: 'First half (48" × 48") is Piece #24. Remaining 48" × 48" easily yields Piece #27 (28.4" × 44.0"), leaving a 19.6" × 44.0" strip and a 4" × 48" offcut.'
   },
   {
     rawSheetNum: 18,
