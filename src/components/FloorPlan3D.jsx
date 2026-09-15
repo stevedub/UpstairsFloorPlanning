@@ -121,11 +121,12 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     camera.position.set(16, 26, 20)
     cameraRef.current = camera
 
-    // Renderer
+    // Renderer with hardware clipping enabled
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
     renderer.setSize(width, height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.shadowMap.enabled = false
+    renderer.localClippingEnabled = true // Enable GPU clipping planes for subfloor boundary
     container.innerHTML = ''
     container.appendChild(renderer.domElement)
     rendererRef.current = renderer
@@ -203,60 +204,55 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     })
 
     // =========================================================================
-    // 1. SUBFLOOR LAYER: EAST-WEST JOISTS & STRICTLY CLIPPED 1x6 DIAGONAL SLATS
+    // 1. SUBFLOOR LAYER: EAST-WEST JOISTS & CONTINUOUS 1x6 DIAGONAL SLATS
     // =========================================================================
-    const slatMat = new THREE.MeshStandardMaterial({ color: 0x855331, roughness: 0.72 })
-    const joistMat = new THREE.MeshStandardMaterial({ color: 0x453120, roughness: 0.85 })
+    // Hardware clipping planes stop joists and slats cleanly at the exterior walls:
+    const subfloorClipPlanes = [
+      new THREE.Plane(new THREE.Vector3(1, 0, 0), 12.75),   // West wall: x >= -12.75
+      new THREE.Plane(new THREE.Vector3(-1, 0, 0), 12.75),  // East wall: x <= 12.75
+      new THREE.Plane(new THREE.Vector3(0, 0, 1), 12.00),   // North wall: z >= -12.00
+      new THREE.Plane(new THREE.Vector3(0, 0, -1), 11.05)   // South wall: z <= 11.05
+    ]
 
-    // Joists running EAST-WEST (parallel to X axis), spaced along Z at 16" (1.33 ft) centers.
-    // Generated strictly within each room boundary with 0% exterior overhang!
-    Object.values(roomBounds3D).forEach((b) => {
-      const zStart = Math.ceil(b.z / 1.33) * 1.33
-      for (let z = zStart; z < b.z + b.d; z += 1.33) {
-        const joistGeo = new THREE.BoxGeometry(b.w - 0.05, 0.15, 0.12)
-        const joistMesh = new THREE.Mesh(joistGeo, joistMat)
-        joistMesh.position.set(b.x + b.w / 2, -0.06, z)
-        subfloorGroup.add(joistMesh)
-      }
+    const joistMat = new THREE.MeshStandardMaterial({
+      color: 0x453120,
+      roughness: 0.85,
+      clippingPlanes: subfloorClipPlanes
     })
 
-    // 1x6 Diagonal Slats at 45°: Clipped strictly inside each room rectangle!
-    // Equation: x - z = C
-    function clipLineToRect(C, xMin, xMax, zMin, zMax) {
-      const pts = []
-      // intersect x = xMin => z = xMin - C
-      const zAtXMin = xMin - C
-      if (zAtXMin >= zMin && zAtXMin <= zMax) pts.push([xMin, zAtXMin])
-      // intersect x = xMax => z = xMax - C
-      const zAtXMax = xMax - C
-      if (zAtXMax >= zMin && zAtXMax <= zMax) pts.push([xMax, zAtXMax])
-      // intersect z = zMin => x = zMin + C
-      const xAtZMin = zMin + C
-      if (xAtZMin > xMin && xAtZMin < xMax) pts.push([xAtZMin, zMin])
-      // intersect z = zMax => x = zMax + C
-      const xAtZMax = zMax + C
-      if (xAtZMax > xMin && xAtZMax < xMax) pts.push([xAtZMax, zMax])
-
-      if (pts.length === 2) {
-        const len = Math.hypot(pts[1][0] - pts[0][0], pts[1][1] - pts[0][1])
-        if (len > 0.25) return { p1: pts[0], p2: pts[1], len }
-      }
-      return null
+    // East-West Joists (parallel to X axis), spaced along Z at 16" (1.33 ft) centers
+    for (let z = -12.0; z <= 11.0; z += 1.33) {
+      const joistGeo = new THREE.BoxGeometry(25.6, 0.14, 0.12)
+      const joistMesh = new THREE.Mesh(joistGeo, joistMat)
+      joistMesh.position.set(0, -0.05, z)
+      subfloorGroup.add(joistMesh)
     }
 
-    for (let c = -28; c <= 28; c += 0.52) { // 0.52 ft = ~6.2" spacing
-      Object.values(roomBounds3D).forEach((b) => {
-        const seg = clipLineToRect(c, b.x + 0.03, b.x + b.w - 0.03, b.z + 0.03, b.z + b.d - 0.03)
-        if (seg) {
-          const mx = (seg.p1[0] + seg.p2[0]) / 2
-          const mz = (seg.p1[1] + seg.p2[1]) / 2
-          const slatGeo = new THREE.BoxGeometry(0.44, 0.03, seg.len)
-          const slatMesh = new THREE.Mesh(slatGeo, slatMat)
-          slatMesh.position.set(mx, 0, mz)
-          slatMesh.rotation.y = Math.PI / 4
-          subfloorGroup.add(slatMesh)
-        }
-      })
+    // Continuous 1x6 Diagonal Slats at 45°:
+    // Placed at y = 0.02 directly atop joists, clearly visible across the entire floor,
+    // with hardware GPU clipping at the exterior walls so 0% extends outside!
+    const slatMat = new THREE.MeshStandardMaterial({
+      color: 0x9e683b, // warm, rich Douglas fir / pine subfloor board tone
+      roughness: 0.65,
+      clippingPlanes: subfloorClipPlanes
+    })
+    const slatEdgeMat = new THREE.LineBasicMaterial({
+      color: 0x3d2410, // dark gap line between 1x6 boards
+      linewidth: 1.5,
+      clippingPlanes: subfloorClipPlanes
+    })
+
+    for (let offset = -28; offset <= 28; offset += 0.48) { // 0.48 ft = 5.75" board width
+      const slatGeo = new THREE.BoxGeometry(0.44, 0.03, 38)
+      const slatMesh = new THREE.Mesh(slatGeo, slatMat)
+      slatMesh.position.set(offset * 0.707, 0.02, -offset * 0.707 - 0.5)
+      slatMesh.rotation.y = Math.PI / 4
+
+      const edges = new THREE.EdgesGeometry(slatGeo)
+      const edgeLine = new THREE.LineSegments(edges, slatEdgeMat)
+      slatMesh.add(edgeLine)
+
+      subfloorGroup.add(slatMesh)
     }
 
     // =========================================================================
@@ -300,10 +296,10 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     })
 
     // =========================================================================
-    // 3. LIFEPROOF COBBLESTONE VINYL PLANK LAYER (INDIVIDUAL ROWS & PLANKS)
+    // 3. LIFEPROOF COBBLESTONE VINYL PLANK LAYER (100% UNIFIED NORTH-SOUTH)
     // =========================================================================
+    // Every single plank across all rooms and closets runs in the EXACT same North-South direction.
     lifeproofMeshesRef.current = []
-    // Realistic multi-tone weathered oak palette for LifeProof Cobblestone Oak:
     const toneColors = [0x827468, 0x918377, 0x75675b] // Warm Greige, Natural Taupe, Smoked Oak
     const plankEdgeMat = new THREE.LineBasicMaterial({ color: 0x3d3229, linewidth: 1.5 })
 
@@ -732,7 +728,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
               <>
                 <div className="flex items-center space-x-2">
                   <span className="w-3 h-3 rounded-sm bg-[#827468]" />
-                  <span className="text-slate-300">LifeProof Cobblestone Oak Planks</span>
+                  <span className="text-slate-300">LifeProof Cobblestone Oak (North-South)</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="w-3 h-3 rounded-sm bg-sky-400" />
@@ -746,8 +742,8 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
                   <span className="text-slate-300">East-West Floor Joists (16" OC)</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="w-3 h-3 rounded-sm bg-[#855331]" />
-                  <span className="text-slate-300">1×6 Diagonal Slats (Inside Walls)</span>
+                  <span className="w-3 h-3 rounded-sm bg-[#9e683b]" />
+                  <span className="text-slate-300">1×6 Diagonal Slats (Clipped to Walls)</span>
                 </div>
               </>
             ) : (
@@ -848,7 +844,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
                 className="w-full accent-amber-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg appearance-none"
               />
               <div className="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
-                <span>1. Primary East Wall</span>
+                <span>1. Primary (East Wall)</span>
                 <span>2. Hallway Spine</span>
                 <span>3. Bed 2 (NW)</span>
                 <span>4. Bed 3 (SW)</span>
@@ -857,7 +853,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
 
             <div className="text-xs text-slate-300 flex items-center space-x-2">
               <span className="hidden md:inline text-slate-400 font-mono text-[11px]">
-                {activeLayer === 'lifeproof' ? 'Click any plank to inspect cut specs' : 'Click any sheet in 3D to inspect cut specs'}
+                {activeLayer === 'lifeproof' ? 'Click any plank in 3D to inspect cut specs' : 'Click any sheet in 3D to inspect cut specs'}
               </span>
             </div>
           </div>
@@ -880,8 +876,8 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
                   <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
                     {selectedLvpRow.zone}
                   </span>
-                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">
-                    {selectedLvpRow.plankCount} Planks in Row ({selectedLvpRow.fullPlanksCount} Full)
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                    100% Unified North-South Orientation
                   </span>
                 </div>
                 <h3 className="text-xl font-bold text-white mt-1">
@@ -912,7 +908,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
                 {selectedLvpRow.starterCut}
               </p>
               <div className="text-[11px] text-slate-400 font-mono">
-                Stagger: {selectedLvpRow.staggerOffset} from previous row
+                Stagger: {selectedLvpRow.staggerOffset} from adjacent row
               </div>
             </div>
 
@@ -925,17 +921,17 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
                 {selectedLvpRow.endCut}
               </p>
               <div className="text-[11px] text-slate-400">
-                Keep minimum 8" length when saving end offcuts for future row starters.
+                Planks in row: {selectedLvpRow.plankCount} ({selectedLvpRow.fullPlanksCount} full factory planks)
               </div>
             </div>
 
             <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5">
               <div className="text-xs font-semibold text-blue-400 flex items-center space-x-1.5">
                 <Info className="w-3.5 h-3.5" />
-                <span>Transition & Doorway Clearance</span>
+                <span>Continuous Flow & Transition Notes</span>
               </div>
               <p className="text-sm text-slate-300 text-xs leading-relaxed">
-                <strong>Notch:</strong> {selectedLvpRow.notchInfo}
+                <strong>Doorway / Notch:</strong> {selectedLvpRow.notchInfo}
               </p>
               <p className="text-[11px] text-slate-400 leading-relaxed mt-1">
                 {selectedLvpRow.specialNotes}
@@ -1033,10 +1029,10 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-white">
-                  Subfloor Framing & 1×6 Diagonal Slat Verification
+                  Subfloor Framing & 1×6 Diagonal Slat Subfloor
                 </h3>
                 <p className="text-xs text-slate-400">
-                  Floor joists run East-West across rooms. 1×6 slats are mathematically clipped strictly inside the house walls.
+                  Floor joists run East-West across rooms. Continuous 1×6 diagonal slats are hardware-clipped strictly inside exterior walls.
                 </p>
               </div>
             </div>
@@ -1055,9 +1051,9 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
             </div>
             <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800">
               <span className="text-[10px] font-mono uppercase text-slate-500">1×6 Board Subfloor</span>
-              <div className="font-bold text-slate-200 mt-1">45° Diagonal Planks (Inside Walls)</div>
+              <div className="font-bold text-slate-200 mt-1">Continuous 45° Diagonal Boards</div>
               <p className="text-slate-400 text-[11px] mt-1">
-                Slats cross joists at 45 degrees. Clipped strictly to room perimeters.
+                Slats run continuously over joists at 45 degrees, stopping cleanly at the exterior walls.
               </p>
             </div>
             <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800">
