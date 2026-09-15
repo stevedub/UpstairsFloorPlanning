@@ -13,8 +13,9 @@ export const CostCalculator = ({ totalSqFt, setTotalSqFt, plywoodCount, setPlywo
   const effectiveArea = totalSqFt * (1 + wastePercent / 100)
 
   // Plywood calculation (32 sq ft per 4x8 sheet)
+  // Physically verified cutting plan requires 19 cut sheets + 1 uncut spare buffer = 20 sheets purchasing target
   const rawPlywood = totalSqFt / plywood.unitSqFt
-  const calculatedPlywood = Math.ceil(effectiveArea / plywood.unitSqFt)
+  const calculatedPlywood = Math.max(20, Math.ceil(effectiveArea / plywood.unitSqFt))
   const plywoodSubtotal = calculatedPlywood * plywood.pricePerUnit
 
   // LifeProof calculation (20.06 sq ft per case)
@@ -166,11 +167,15 @@ export const CostCalculator = ({ totalSqFt, setTotalSqFt, plywoodCount, setPlywo
                 <span className="text-slate-300">{rawPlywood.toFixed(1)} sheets</span>
               </div>
               <div className="flex justify-between text-amber-400 font-bold pt-1 border-t border-slate-800">
-                <span>Purchasing (+{wastePercent}%):</span>
-                <span className="text-base">{calculatedPlywood} sheets</span>
+                <span>Purchasing Target:</span>
+                <span className="text-base font-mono">{calculatedPlywood} sheets</span>
+              </div>
+              <div className="text-[11px] text-emerald-400 flex items-center justify-between">
+                <span>Sheet Breakdown:</span>
+                <span>19 cut sheets + 1 spare buffer</span>
               </div>
               <div className="text-[11px] text-slate-400">
-                Covers {(calculatedPlywood * plywood.unitSqFt)} sq ft ({Math.round(calculatedPlywood * plywood.unitSqFt - totalSqFt)} sq ft overage)
+                Covers {(calculatedPlywood * plywood.unitSqFt)} sq ft ({Math.round(calculatedPlywood * plywood.unitSqFt - totalSqFt)} sq ft buffer)
               </div>
             </div>
 

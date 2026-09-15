@@ -72,12 +72,12 @@ export const LayoutSequencer = ({ activeStep, setActiveStep, onNavigateTo3D }) =
 
           <div className="flex items-center space-x-3 font-mono text-xs">
             <div className="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-center">
-              <div className="text-emerald-400 font-bold text-lg">19</div>
-              <div className="text-slate-400 text-[10px] uppercase">Raw 4×8s Needed</div>
+              <div className="text-emerald-400 font-bold text-lg">20</div>
+              <div className="text-slate-400 text-[10px] uppercase">Sheets to Buy (19+1)</div>
             </div>
             <div className="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-center">
-              <div className="text-blue-400 font-bold text-lg">+1</div>
-              <div className="text-slate-400 text-[10px] uppercase">Spare Buffer</div>
+              <div className="text-blue-400 font-bold text-lg">19</div>
+              <div className="text-slate-400 text-[10px] uppercase">Raw Sheets Cut</div>
             </div>
             <div className="px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center">
               <div className="text-white font-bold text-lg">{sheetLayoutData.length}</div>

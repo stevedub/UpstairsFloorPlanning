@@ -14,7 +14,7 @@ export const productsData = {
     standardOveragePercent: 15, // standard buffer for sheet goods with stagger & doorways
     returnPolicy: 'Turkstra Lumber allows return of clean, undamaged, uncut stock sheets with original receipt.',
     recommendedFastenerSpacing: '6" along panel edges, 8" in interior field',
-    notes: 'APA Underlayment grade fir plywood. Smooth B-grade face sanded smooth, exterior glue line, cross-laminated for high dimensional stability over 1x6 slat subfloors.'
+    notes: 'APA Underlayment grade fir plywood. Smooth B-grade face sanded smooth, exterior glue line, cross-laminated for high dimensional stability over 1x6 slat subfloors. Order target: 20 sheets (19 cut sheets to produce all 28 pieces + 1 uncut spare buffer sheet).'
   },
   flooring: {
     id: 'lifeproof-lvp',

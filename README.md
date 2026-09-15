@@ -23,12 +23,12 @@ An interactive, responsive web application and 3D cutting visualizer built speci
 
 | Material | Raw Need | Recommended Buffer (+15%) | Purchasing Target | Subtotal (CAD) |
 |---|---|---|---|---|
-| **1/2" 4x8 BCX Fir Plywood** | 16.4 sheets | +15% (~604 sq ft) | **19 sheets** (covers 608 sq ft) | **$1,135.06** |
+| **1/2" 4x8 BCX Fir Plywood** | 16.4 sheets | +15% (~604 sq ft) + 1 buffer | **20 sheets** (covers 640 sq ft) | **$1,194.80** |
 | **LifeProof 22-MIL LVP** | 26.2 cases | +15% (~604 sq ft) | **31 cases** (covers 621.8 sq ft) | **$2,661.35** |
-| **Paulin Floor Screws** | ~1,600 plywood screws + 300 slat screws | ~2,000 screws | **4 boxes** (2,000 screws total) | **$147.92** |
-| **Subtotal** | | | | **$3,944.33** |
-| **Ontario HST (13%)** | | | | **$512.76** |
-| **Estimated Grand Total** | | | | **$4,457.09 CAD** |
+| **Paulin Floor Screws** | ~1,600 plywood screws + 300 slat screws | ~1,900 screws | **4 boxes** (2,000 screws total) | **$147.92** |
+| **Subtotal** | | | | **$4,004.07** |
+| **Ontario HST (13%)** | | | | **$520.53** |
+| **Estimated Grand Total** | | | | **$4,524.60 CAD** |
 
 *Note: The app allows live adjustment between 10%, 15%, 20%, or custom waste percentages.*
 

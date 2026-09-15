@@ -17,9 +17,9 @@ export default function App() {
 
   // Calculated properties shared across app
   const totalSqFt = rooms.filter(r => r.isIncluded).reduce((acc, r) => acc + r.sqft, 0)
-  const [plywoodCount, setPlywoodCount] = useState(19)
+  const [plywoodCount, setPlywoodCount] = useState(20)
   const [flooringBoxes, setFlooringBoxes] = useState(31)
-  const [totalCost, setTotalCost] = useState(4490)
+  const [totalCost, setTotalCost] = useState(4525)
 
   const handleNavigate = (sectionId) => {
     setActiveSection(sectionId)
