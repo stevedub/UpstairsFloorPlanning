@@ -3,28 +3,27 @@ import { sheetLayoutData } from '../data/sheetLayoutData.js'
 import { Scissors, CheckCircle, ArrowRight, Filter, Search, Eye, Sparkles } from 'lucide-react'
 
 export const LayoutSequencer = ({ activeStep, setActiveStep, onNavigateTo3D }) => {
-  const [selectedRoom, setSelectedRoom] = useState('all')
+  const [selectedZone, setSelectedZone] = useState('all')
   const [selectedStatus, setSelectedStatus] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
 
-  const roomsList = [
-    { id: 'all', label: 'All Rooms (20 Sheets)' },
-    { id: 'Primary Bedroom', label: 'Primary Bedroom (Sheets 1–7)' },
-    { id: 'Primary Closet', label: 'Primary Closet (Sheet 8)' },
-    { id: 'Hallway', label: 'Hallway (Sheets 9–11)' },
-    { id: 'Bedroom 2 (NW)', label: 'Bedroom 2 NW (Sheets 12–15)' },
-    { id: 'Bedroom 2 Closet', label: 'Bed 2 Closet (Sheet 16)' },
-    { id: 'Bedroom 3 (SW)', label: 'Bedroom 3 SW (Sheets 17–19)' },
-    { id: 'Bedroom 3 Closets (North & South)', label: 'Bed 3 Closets (Sheet 20)' },
+  const zonesList = [
+    { id: 'all', label: 'All 4 Zones (20 Sheets)' },
+    { id: 'Zone 1', label: 'Zone 1: Primary Bedroom & Closet (Sheets 1–9)' },
+    { id: 'Zone 2', label: 'Zone 2: Hallway & Linen Closet (Sheets 10–11)' },
+    { id: 'Zone 3', label: 'Zone 3: Bedroom 2 NW & Closet (Sheets 12–16)' },
+    { id: 'Zone 4', label: 'Zone 4: Bedroom 3 SW & Closets (Sheets 17–20)' },
   ]
 
   const filteredSheets = sheetLayoutData.filter((sheet) => {
-    const matchesRoom = selectedRoom === 'all' || sheet.room === selectedRoom
+    const matchesZone = selectedZone === 'all' || (sheet.zone && sheet.zone.includes(selectedZone))
     const matchesStatus = selectedStatus === 'all' || sheet.status === selectedStatus
     const matchesSearch = sheet.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           sheet.cutDimensions.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          sheet.room.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesRoom && matchesStatus && matchesSearch
+                          sheet.room.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (sheet.shapeType && sheet.shapeType.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                          (sheet.zone && sheet.zone.toLowerCase().includes(searchTerm.toLowerCase()))
+    return matchesZone && matchesStatus && matchesSearch
   })
 
   const fullCount = sheetLayoutData.filter(s => s.status === 'full').length
@@ -68,12 +67,12 @@ export const LayoutSequencer = ({ activeStep, setActiveStep, onNavigateTo3D }) =
         <div className="mt-6 pt-6 border-t border-slate-800 flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
           <div className="flex flex-wrap gap-2">
             <select
-              value={selectedRoom}
-              onChange={(e) => setSelectedRoom(e.target.value)}
+              value={selectedZone}
+              onChange={(e) => setSelectedZone(e.target.value)}
               className="px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-medium"
             >
-              {roomsList.map(r => (
-                <option key={r.id} value={r.id}>{r.label}</option>
+              {zonesList.map(z => (
+                <option key={z.id} value={z.id}>{z.label}</option>
               ))}
             </select>
 
@@ -143,17 +142,24 @@ export const LayoutSequencer = ({ activeStep, setActiveStep, onNavigateTo3D }) =
                   </span>
                   <div>
                     <div className="text-xs font-semibold text-white">{sheet.position}</div>
-                    <div className="text-[11px] font-mono text-slate-400">{sheet.room}</div>
+                    <div className="flex items-center space-x-2 mt-0.5">
+                      <span className="text-[10px] font-mono text-slate-400">{sheet.room}</span>
+                      {sheet.zone && (
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-mono">
+                          {sheet.zone.split(':')[0]}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-1.5">
+                <div className="flex items-center space-x-1.5 shrink-0">
                   <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full ${
                     isFull
                       ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                       : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                   }`}>
-                    {sheet.type}
+                    {sheet.shapeType || sheet.type}
                   </span>
                 </div>
               </div>

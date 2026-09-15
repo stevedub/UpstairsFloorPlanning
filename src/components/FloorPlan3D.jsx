@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { sheetLayoutData } from '../data/sheetLayoutData.js'
 import { roomBounds3D } from '../data/floorData.js'
-import { Eye, Layers, Play, Pause, ChevronLeft, ChevronRight, Info, CheckCircle2, Scissors, MapPin, Image as ImageIcon, Ban } from 'lucide-react'
+import { Eye, Layers, Play, Pause, ChevronLeft, ChevronRight, Info, CheckCircle2, Scissors, MapPin, Image as ImageIcon, Sparkles } from 'lucide-react'
 
 export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
   const mountRef = useRef(null)
@@ -12,7 +12,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
   const [showPdfOverlay, setShowPdfOverlay] = useState(false)
   const [selectedSheet, setSelectedSheet] = useState(sheetLayoutData[0])
   const [isPlaying, setIsPlaying] = useState(false)
-  const [cameraMode, setCameraMode] = useState('3d') // '3d' | 'top' | 'primary' | 'hallway'
+  const [cameraMode, setCameraMode] = useState('3d')
 
   const sceneRef = useRef(null)
   const cameraRef = useRef(null)
@@ -61,7 +61,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
 
     // Scene
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color(0x0a0e17) // deep architectural navy
+    scene.background = new THREE.Color(0x0a0e17)
     sceneRef.current = scene
 
     // Camera
@@ -69,7 +69,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     camera.position.set(16, 26, 20)
     cameraRef.current = camera
 
-    // Renderer (clean, crisp, NO shadow maps to prevent visual artifacts)
+    // Renderer (No shadows to eliminate artifacts)
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
     renderer.setSize(width, height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -150,7 +150,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
       pdfOverlayMeshRef.current = overlayMesh
     })
 
-    // 1. BUILD SUBFLOOR LAYER (1x6 diagonal slats over floor joists)
+    // 1. SUBFLOOR LAYER (1x6 diagonal slats over joists)
     const slatMat = new THREE.MeshStandardMaterial({ color: 0x855331, roughness: 0.7 })
     const joistMat = new THREE.MeshStandardMaterial({ color: 0x453120, roughness: 0.85 })
 
@@ -165,17 +165,26 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
       const slatGeo = new THREE.BoxGeometry(0.48, 0.03, 34)
       const slatMesh = new THREE.Mesh(slatGeo, slatMat)
       slatMesh.position.set(0, 0, -0.5)
-      slatMesh.rotation.y = Math.PI / 4 // 45 degrees
+      slatMesh.rotation.y = Math.PI / 4
       slatMesh.position.x = offset * 0.707
       slatMesh.position.z = -offset * 0.707 - 0.5
       subfloorGroup.add(slatMesh)
     }
 
-    // 2. BUILD PLYWOOD UNDERLAYMENT SHEETS (4x8 BCX Fir) - ZERO OVERLAPS
+    // 2. PLYWOOD LAYER - IRREGULAR POLYGONS & RECTANGLES (ZERO OVERLAPS)
     sheetMeshesRef.current = []
     sheetLayoutData.forEach((sheet) => {
-      const { x, z, w, d } = sheet.targetCoords
-      const sheetGeo = new THREE.BoxGeometry(w - 0.04, 0.06, d - 0.04)
+      const shape = new THREE.Shape()
+      sheet.polygon.forEach(([px, pz], idx) => {
+        if (idx === 0) shape.moveTo(px, pz)
+        else shape.lineTo(px, pz)
+      })
+      shape.closePath()
+
+      const extrudeSettings = { depth: 0.06, bevelEnabled: false }
+      const sheetGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings)
+      sheetGeo.rotateX(Math.PI / 2)
+      sheetGeo.translate(0, 0.06, 0)
 
       const isFull = sheet.status === 'full'
       const baseColor = isFull ? 0x10b981 : 0xf59e0b
@@ -186,11 +195,13 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
       })
 
       const mesh = new THREE.Mesh(sheetGeo, sheetMat)
-      mesh.position.set(x + w / 2, 0.06, z + d / 2)
       mesh.userData = { sheet }
 
       const edges = new THREE.EdgesGeometry(sheetGeo)
-      const lineMat = new THREE.LineBasicMaterial({ color: isFull ? 0x047857 : 0xb45309, linewidth: 2 })
+      const lineMat = new THREE.LineBasicMaterial({
+        color: isFull ? 0x047857 : 0xb45309,
+        linewidth: 2.5
+      })
       const wireframe = new THREE.LineSegments(edges, lineMat)
       mesh.add(wireframe)
 
@@ -198,9 +209,9 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
       sheetMeshesRef.current.push(mesh)
     })
 
-    // 3. BUILD LIFEPROOF COBBLESTONE VINYL PLANK LAYER
+    // 3. LIFEPROOF COBBLESTONE VINYL PLANK LAYER
     const plankMat = new THREE.MeshStandardMaterial({
-      color: 0x695e54, // Cobblestone warm taupe/grey
+      color: 0x695e54,
       roughness: 0.45,
       metalness: 0.05
     })
@@ -218,26 +229,21 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
       lifeproofGroup.add(roomPlankMesh)
     })
 
-    // 4. EXCLUDED 5PC BATHROOM & BATH CLOSET (CRIMSON RED TO SHOW EXCLUSION)
-    // 5PC Bath Base
+    // 4. EXCLUDED 5PC BATHROOM & BATH CLOSET (CRIMSON RED)
     const bathBounds = roomBounds3D['bath-5pc']
     const bathGeo = new THREE.BoxGeometry(bathBounds.w - 0.08, 0.07, bathBounds.d - 0.08)
     const bathMat = new THREE.MeshStandardMaterial({
-      color: 0xef4444, // Red
+      color: 0xef4444,
       roughness: 0.4,
       transparent: true,
       opacity: 0.65
     })
     const bathMesh = new THREE.Mesh(bathGeo, bathMat)
     bathMesh.position.set(bathBounds.x + bathBounds.w / 2, 0.05, bathBounds.z + bathBounds.d / 2)
-    
-    // Red exclusion outline border
     const bathEdges = new THREE.EdgesGeometry(bathGeo)
-    const bathEdgeLine = new THREE.LineSegments(bathEdges, new THREE.LineBasicMaterial({ color: 0xb91c1c, linewidth: 2.5 }))
-    bathMesh.add(bathEdgeLine)
+    bathMesh.add(new THREE.LineSegments(bathEdges, new THREE.LineBasicMaterial({ color: 0xb91c1c, linewidth: 2.5 })))
     wallsGroup.add(bathMesh)
 
-    // Bath Closet (Excluded Red)
     const bathCloBounds = roomBounds3D['bath-closet']
     const bathCloGeo = new THREE.BoxGeometry(bathCloBounds.w - 0.08, 0.07, bathCloBounds.d - 0.08)
     const bathCloMesh = new THREE.Mesh(bathCloGeo, bathMat)
@@ -246,7 +252,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     bathCloMesh.add(new THREE.LineSegments(bathCloEdges, new THREE.LineBasicMaterial({ color: 0xb91c1c, linewidth: 2.5 })))
     wallsGroup.add(bathCloMesh)
 
-    // Stairs Opening ("DN") with 8 step treads leading down
+    // Stairs Opening ("DN") with 8 step treads
     const stairBounds = roomBounds3D['stairs']
     for (let i = 0; i < 8; i++) {
       const stepD = stairBounds.d / 8
@@ -261,7 +267,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
       wallsGroup.add(stepMesh)
     }
 
-    // 5. ARCHITECTURAL WALLS & MASTER CLOSET ENCLOSURE (Matching PDF)
+    // 5. ARCHITECTURAL WALLS & MASTER CLOSET ENCLOSURE
     const wallMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 })
     const interiorWallMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.8 })
     const windowMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.1, transparent: true, opacity: 0.85 })
@@ -277,11 +283,10 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
       return mesh
     }
 
-    // Exterior Perimeter Walls
-    // North Exterior Wall (spans across Bedroom 2 and Primary)
-    createWallSegment(-13.1, -12.36, 26.2, wallThick, true)
+    // Exterior Perimeter
+    createWallSegment(-13.1, -12.36, 26.2, wallThick, true) // North exterior wall
 
-    // East Exterior Wall (Primary & Bath) with windows
+    // East Exterior Wall with windows
     createWallSegment(12.71, -12.36, wallThick, 6.0, true)
     const eastWinGeo = new THREE.BoxGeometry(wallThick + 0.05, 0.8, 4.0)
     const eastWin = new THREE.Mesh(eastWinGeo, windowMat)
@@ -294,7 +299,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     wallsGroup.add(bathWin)
     createWallSegment(12.71, 8.0, wallThick, 3.2, true)
 
-    // West Exterior Wall (Bedroom 2 & 3) with windows
+    // West Exterior Wall with windows
     createWallSegment(-13.1, -12.36, wallThick, 4.0, true)
     const b2WinGeo = new THREE.BoxGeometry(wallThick + 0.05, 0.8, 4.5)
     const b2Win = new THREE.Mesh(b2WinGeo, windowMat)
@@ -312,46 +317,37 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     createWallSegment(-2.35, 12.8, 3.54, wallThick, true)
     createWallSegment(0.81, 11.02, 12.28, wallThick, true)
 
-    // INTERIOR WALLS & ACCURATE HALLWAY / BEDROOM 2 BOUNDARY
-    // Wall between Bedroom 2 and Primary Bedroom (X: 0.81, Z: -11.98 to -2.61)
+    // Interior Walls
+    // Divider between Bedroom 2 and Primary (X: 0.81, Z: -11.98 to -2.61)
     createWallSegment(0.81, -11.98, wallThick, 9.37)
 
-    // South Wall of Bedroom 2 (Z: -2.61, X: -13.1 to 0.81)
-    // Stops the Hallway from going to the end! Leaves door opening into Bedroom 2.
-    createWallSegment(-13.1, -2.61, 8.0, wallThick) // West section above closet
-    // Doorway into Bedroom 2 at (X: -2.35 to -0.5)
-    createWallSegment(-0.5, -2.61, 1.31, wallThick) // East corner to Primary divider
+    // Bedroom 2 South Wall (stops Hallway from extending north!)
+    createWallSegment(-13.1, -2.61, 8.0, wallThick)
+    createWallSegment(-0.5, -2.61, 1.31, wallThick) // leaves doorway between -2.35 and -0.5
 
-    // Wall between Central Hallway and Primary Bedroom (X: 0.81, Z: -2.61 to 1.19)
-    // Primary Door Opening between Z: -2.0 and 0.5
-    createWallSegment(0.81, 0.5, wallThick, 0.69)
+    // Divider between Hallway and Primary Bedroom
+    createWallSegment(0.81, 0.5, wallThick, 0.69) // leaves doorway into Primary
 
-    // MASTER (PRIMARY) CLOSET WALLS & ENCLOSURE
-    // North wall of Master Closet with sliding door opening (Z: 1.19, X: 0.81 to 9.57)
-    createWallSegment(0.81, 1.19, 1.8, wallThick) // Left return jamb
-    createWallSegment(7.5, 1.19, 2.07, wallThick) // Right return jamb
-    // Sliding door header / track
+    // MASTER CLOSET ENCLOSURE WALLS
+    createWallSegment(0.81, 1.19, 1.8, wallThick) // Left return
+    createWallSegment(7.5, 1.19, 2.07, wallThick) // Right return
     const closetHeaderGeo = new THREE.BoxGeometry(4.89, 0.35, wallThick)
     const closetHeader = new THREE.Mesh(closetHeaderGeo, interiorWallMat)
     closetHeader.position.set(2.61 + 4.89 / 2, wallHeight - 0.175, 1.19 + wallThick / 2)
     wallsGroup.add(closetHeader)
-
-    // East return wall of Master Closet (separating closet from East alcove, X: 9.57, Z: 1.19 to 3.49)
-    createWallSegment(9.57, 1.19, wallThick, 2.30)
-
-    // South wall of Master Closet / Primary divider to 5PC Bath (Z: 3.49, X: 0.81 to 12.71)
-    createWallSegment(0.81, 3.49, 11.9, wallThick)
+    createWallSegment(9.57, 1.19, wallThick, 2.30) // East return wall
+    createWallSegment(0.81, 3.49, 11.9, wallThick) // South wall to 5PC Bath
 
     // Closets between Bedroom 2 and Bedroom 3
-    createWallSegment(-13.1, -0.65, 10.75, wallThick) // South closet face
-    createWallSegment(-9.37, -2.61, wallThick, 1.96) // Bed 2 / Bed 3 closet divider
-    createWallSegment(-4.35, -2.61, wallThick, 1.96) // Bed 3 / Linen closet divider
+    createWallSegment(-13.1, -0.65, 10.75, wallThick)
+    createWallSegment(-9.37, -2.61, wallThick, 1.96)
+    createWallSegment(-4.35, -2.61, wallThick, 1.96)
 
-    // Bedroom 3 / Hallway divider (X: -2.35, Z: -0.65 to 11.02) with door opening
+    // Bedroom 3 / Hallway divider
     createWallSegment(-2.35, -0.65, wallThick, 2.5)
     createWallSegment(-2.35, 4.5, wallThick, 6.52)
 
-    // Hallway / 5PC Bath divider (X: 0.81, Z: 3.49 to 11.02) with bathroom door opening
+    // Hallway / 5PC Bath divider
     createWallSegment(0.81, 6.5, wallThick, 4.52)
 
     // 6. EXACT STARTING ARROW PIN (Primary Outside Corner)
@@ -470,7 +466,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
       const isFull = sheet.status === 'full'
 
       if (isCurrent) {
-        mesh.material.color.setHex(0x38bdf8) // bright cyan
+        mesh.material.color.setHex(0x38bdf8) // bright cyan highlight
       } else {
         mesh.material.color.setHex(isFull ? 0x10b981 : 0xf59e0b)
       }
@@ -620,7 +616,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
             </div>
             <div className="flex items-center space-x-2">
               <span className="w-3 h-3 rounded-sm bg-amber-500" />
-              <span className="text-slate-300">Custom Cut Sheet (Rip / Cross / Stagger)</span>
+              <span className="text-slate-300">Irregular Cut (L-Shape / T-Notch / Wrap)</span>
             </div>
             <div className="flex items-center space-x-2">
               <span className="w-3 h-3 rounded-sm bg-sky-400" />
@@ -683,9 +679,10 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
                 className="w-full accent-amber-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg appearance-none"
               />
               <div className="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
-                <span>Start: Primary Corner</span>
-                <span>Hallway Hub</span>
-                <span>Finish: Closets</span>
+                <span>1. Primary Corner</span>
+                <span>2. Hallway</span>
+                <span>3. Bed 2 (touching Primary)</span>
+                <span>4. Bed 3 (final)</span>
               </div>
             </div>
 
@@ -713,14 +710,16 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
                   <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
                     Step {selectedSheet.stepNumber} of 20
                   </span>
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    {selectedSheet.zone}
+                  </span>
                   <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
                     selectedSheet.status === 'full'
                       ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                       : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                   }`}>
-                    {selectedSheet.type}
+                    {selectedSheet.shapeType}
                   </span>
-                  <span className="text-xs font-mono text-slate-400">{selectedSheet.room}</span>
                 </div>
                 <h3 className="text-xl font-bold text-white mt-1">
                   {selectedSheet.position}
@@ -744,7 +743,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
             <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5">
               <div className="text-xs font-semibold text-amber-400 flex items-center space-x-1.5">
                 <Scissors className="w-3.5 h-3.5" />
-                <span>Exact Cut Instructions</span>
+                <span>Exact Cut Instructions (Maximize Sheet Size)</span>
               </div>
               <p className="text-sm text-slate-200 font-medium leading-relaxed">
                 {selectedSheet.cutDimensions}
@@ -764,7 +763,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
             <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5">
               <div className="text-xs font-semibold text-blue-400 flex items-center space-x-1.5">
                 <Info className="w-3.5 h-3.5" />
-                <span>Installation & Gap Rule</span>
+                <span>Installation Sequence & Doorway Rule</span>
               </div>
               <p className="text-sm text-slate-300 text-xs leading-relaxed">
                 {selectedSheet.notes}
