@@ -11,8 +11,8 @@ export const LayoutSequencer = ({ activeStep, setActiveStep, onNavigateTo3D }) =
     { id: 'all', label: `All 4 Zones (${sheetLayoutData.length} Pieces)` },
     { id: 'Zone 1', label: 'Zone 1: Primary Bedroom & Master Closet (Pieces 1–9)' },
     { id: 'Zone 2', label: 'Zone 2: Hallway & Linen Closet (Pieces 10–12)' },
-    { id: 'Zone 3', label: 'Zone 3: Bedroom 2 NW & Closet (Pieces 13–20)' },
-    { id: 'Zone 4', label: 'Zone 4: Bedroom 3 SW & Closets (Pieces 21–27)' },
+    { id: 'Zone 3', label: 'Zone 3: Bedroom 2 NW & Closet (Pieces 13–21)' },
+    { id: 'Zone 4', label: 'Zone 4: Bedroom 3 SW & Closets (Pieces 22–28)' },
   ]
 
   const filteredSheets = sheetLayoutData.filter((sheet) => {

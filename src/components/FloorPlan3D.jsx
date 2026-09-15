@@ -321,15 +321,16 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     // Divider between Bedroom 2 and Primary (X: 0.81, Z: -11.98 to -2.61)
     createWallSegment(0.81, -11.98, wallThick, 9.37)
 
-    // Bedroom 2 South Wall (stops Hallway from extending north!)
-    // Wall between Bedroom 2 and Bed 3 North Closet & Linen Closet
-    createWallSegment(-9.37, -3.01, 7.02, wallThick)
-    // Bed 2 Closet Door Opening Header (X: -12.72 to -9.37, Z: -3.01)
-    const b2CloHeaderGeo = new THREE.BoxGeometry(3.35, 0.35, wallThick)
+    // Bedroom 2 South Wall & Bedroom 2 Closet (Middle Closet) Doorway
+    // Solid wall between Bedroom 2 and Bed 3 North Closet (Left closet)
+    createWallSegment(-13.1, -3.01, 3.73, wallThick)
+    // Bedroom 2 Closet Door Header (Middle closet sliding door opening: X: -9.37 to -4.35, Z: -3.01)
+    const b2CloHeaderGeo = new THREE.BoxGeometry(5.02, 0.35, wallThick)
     const b2CloHeader = new THREE.Mesh(b2CloHeaderGeo, interiorWallMat)
-    b2CloHeader.position.set(-12.72 + 3.35 / 2, wallHeight - 0.175, -3.01 + wallThick / 2)
+    b2CloHeader.position.set(-9.37 + 5.02 / 2, wallHeight - 0.175, -3.01 + wallThick / 2)
     wallsGroup.add(b2CloHeader)
-
+    // Solid wall between Bedroom 2 and Linen Closet
+    createWallSegment(-4.35, -3.01, 2.00, wallThick)
     // Bedroom 2 Entry Door Wall (leaves door opening between X: -2.35 and -0.50)
     createWallSegment(-0.5, -2.61, 1.31, wallThick)
 
@@ -337,25 +338,25 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     createWallSegment(0.81, 0.5, wallThick, 0.69)
 
     // MASTER CLOSET ENCLOSURE WALLS
-    createWallSegment(0.81, 1.19, 1.8, wallThick) // Left return
-    createWallSegment(7.5, 1.19, 2.07, wallThick) // Right return
-    const closetHeaderGeo = new THREE.BoxGeometry(4.89, 0.35, wallThick)
+    createWallSegment(0.81, 1.19, 1.58, wallThick) // Left return
+    createWallSegment(7.98, 1.19, 1.59, wallThick) // Right return
+    const closetHeaderGeo = new THREE.BoxGeometry(5.59, 0.35, wallThick)
     const closetHeader = new THREE.Mesh(closetHeaderGeo, interiorWallMat)
-    closetHeader.position.set(2.61 + 4.89 / 2, wallHeight - 0.175, 1.19 + wallThick / 2)
+    closetHeader.position.set(2.39 + 5.59 / 2, wallHeight - 0.175, 1.19 + wallThick / 2)
     wallsGroup.add(closetHeader)
     createWallSegment(9.57, 1.19, wallThick, 2.30) // East return wall
     createWallSegment(0.81, 3.49, 11.9, wallThick) // South wall to 5PC Bath
 
-    // WEST CLOSETS DIVIDERS & OPENINGS (Bed 2 Closet, Bed 3 North Closet, Hall Linen)
-    createWallSegment(-9.37, -3.01, wallThick, 2.36) // Divider between Bed 2 closet and Bed 3 North closet
-    createWallSegment(-4.35, -3.01, wallThick, 2.36) // Divider between Bed 3 North closet and Linen closet
-    createWallSegment(-13.1, -0.65, 3.73, wallThick) // South wall of Bed 2 closet (Z: -0.65)
-    createWallSegment(-4.35, -0.65, 2.00, wallThick) // South wall of Linen closet (Z: -0.65)
+    // WEST CLOSETS DIVIDERS & OPENINGS (Bed 3 North Closet, Bed 2 Closet, Hall Linen)
+    createWallSegment(-9.37, -3.01, wallThick, 2.36) // Divider between Bed 3 North closet and Bed 2 closet
+    createWallSegment(-4.35, -3.01, wallThick, 2.36) // Divider between Bed 2 closet and Linen closet
+    createWallSegment(-9.37, -0.65, 5.02, wallThick) // Solid South wall of Bed 2 closet (Z: -0.65)
+    createWallSegment(-4.35, -0.65, 2.00, wallThick) // Solid South wall of Linen closet (Z: -0.65)
 
-    // Bed 3 North Closet Door Header (opening facing south into Bedroom 3 at Z: -0.65)
-    const b3NCloHeaderGeo = new THREE.BoxGeometry(5.02, 0.35, wallThick)
+    // Bed 3 North Closet Door Header (opening facing south into Bedroom 3 at Z: -0.65, X: -12.72 to -9.37)
+    const b3NCloHeaderGeo = new THREE.BoxGeometry(3.35, 0.35, wallThick)
     const b3NCloHeader = new THREE.Mesh(b3NCloHeaderGeo, interiorWallMat)
-    b3NCloHeader.position.set(-9.37 + 5.02 / 2, wallHeight - 0.175, -0.65 + wallThick / 2)
+    b3NCloHeader.position.set(-12.72 + 3.35 / 2, wallHeight - 0.175, -0.65 + wallThick / 2)
     wallsGroup.add(b3NCloHeader)
 
     // Linen Closet Door Header (opening facing east into Hallway at X: -2.35)
@@ -377,6 +378,33 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
 
     // Hallway / 5PC Bath divider
     createWallSegment(0.81, 6.5, wallThick, 4.52)
+
+    // AUTHENTIC GREY DOORWAY THRESHOLD MARKERS (1:1 with FloorPlan.pdf grey door drawings)
+    const doorMat = new THREE.MeshBasicMaterial({ color: 0xdfdfdf, side: THREE.DoubleSide })
+    const addGreyDoor = (x, z, w, d) => {
+      const geo = new THREE.PlaneGeometry(w, d)
+      const mesh = new THREE.Mesh(geo, doorMat)
+      mesh.rotation.x = -Math.PI / 2
+      mesh.position.set(x + w / 2, 0.065, z + d / 2)
+      wallsGroup.add(mesh)
+    }
+
+    // 1. Bedroom 2 Closet Sliding Door (Middle closet, North wall)
+    addGreyDoor(-9.37, -3.01, 5.02, wallThick)
+    // 2. Bedroom 3 North Closet Door (Left closet, South wall)
+    addGreyDoor(-12.72, -0.65, 3.35, wallThick)
+    // 3. Hallway Linen Closet Door (East wall into Hallway)
+    addGreyDoor(-2.35, -3.01, wallThick, 2.36)
+    // 4. Bedroom 3 South Closet Door (North wall into Bed 3)
+    addGreyDoor(-7.19, 9.12, 4.84, wallThick)
+    // 5. Master Closet Sliding Door (North wall into Primary)
+    addGreyDoor(2.39, 1.19, 5.59, wallThick)
+    // 6. Bedroom 2 Entry Door (from Hallway)
+    addGreyDoor(-2.35, -2.61, 1.85, wallThick)
+    // 7. Bedroom 3 Entry Door (from Hallway)
+    addGreyDoor(-2.35, 1.85, wallThick, 2.65)
+    // 8. Primary Bedroom Entry Door (from Hallway)
+    addGreyDoor(0.81, -0.50, wallThick, 1.00)
 
     // 6. EXACT STARTING ARROW PIN (Primary Outside Corner)
     const pinGroup = new THREE.Group()

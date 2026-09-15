@@ -36,11 +36,11 @@ export const initialRoomsData = [
   {
     id: 'bedroom-2-closet',
     name: 'Bedroom 2 Closet',
-    dims: "3'4\" × 2'4\"",
+    dims: "5'0\" × 2'4\"",
     sqft: 14,
     type: 'closet',
     isIncluded: true,
-    description: 'South closet inside NW Bedroom adjoining divider wall.',
+    description: 'Middle closet with sliding doors opening north directly into Bedroom 2.',
     color: '#34d399',
   },
   {
@@ -56,11 +56,11 @@ export const initialRoomsData = [
   {
     id: 'bedroom-3-closet-n',
     name: 'Bedroom 3 North Closet',
-    dims: "5'0\" × 2'4\"",
-    sqft: 14,
+    dims: "3'4\" × 2'4\"",
+    sqft: 10,
     type: 'closet',
     isIncluded: true,
-    description: 'Upper closet in Bedroom 3 sharing wall with Bed 2 closet.',
+    description: 'North-west corner closet opening south directly into Bedroom 3.',
     color: '#a78bfa',
   },
   {
@@ -146,18 +146,18 @@ export const roomBounds3D = {
     tag: '121 sq ft'
   },
   'bedroom-2-closet': {
-    x: -12.72, z: -3.01, w: 3.35, d: 2.36,
-    labelPos: [-11.05, 0.2, -1.83],
-    name: 'Bed 2 Closet',
-    dims: "3'4\" × 2'4\"",
+    x: -9.37, z: -3.01, w: 5.02, d: 2.36,
+    labelPos: [-6.86, 0.2, -1.83],
+    name: 'Bed 2 Closet (Middle)',
+    dims: "5'0\" × 2'4\"",
     tag: '14 sq ft'
   },
   'bedroom-3-closet-n': {
-    x: -9.37, z: -3.01, w: 5.02, d: 2.36,
-    labelPos: [-6.86, 0.2, -1.83],
-    name: 'Bed 3 Closet N',
-    dims: "5'0\" × 2'4\"",
-    tag: '14 sq ft'
+    x: -12.72, z: -3.01, w: 3.35, d: 2.36,
+    labelPos: [-11.05, 0.2, -1.83],
+    name: 'Bed 3 North Closet',
+    dims: "3'4\" × 2'4\"",
+    tag: '10 sq ft'
   },
   'hall-closet': {
     x: -4.35, z: -3.01, w: 2.00, d: 2.36,

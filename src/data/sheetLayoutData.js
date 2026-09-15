@@ -1,14 +1,15 @@
-// 27-Piece Plywood Underlayment Cut Catalog & Verified Irregular Polygon Sequence
-// Strictly adheres to:
-// 1. NO PIECE EXCEEDS 4ft × 8ft (All pieces fit on a physical 4x8 BCX plywood sheet)
-// 2. All closets are 100% filled (Primary Closet, Bed 2 Closet, Bed 3 North Closet, Bed 3 South Closet, Linen Closet)
-// 3. Primary Closet uses a dedicated 4x8 sheet (8ft main runner + end fill from same offcut)
-// 4. Strict 4-Zone sequence:
-//    - Zone 1: Primary Bedroom & Master Closet (starts in NE outside corner under red arrow)
-//    - Zone 2: Central Hallway & Linen Closet
-//    - Zone 3: Bedroom 2 NW & Closet (starts from wall adjacent to Primary, works down/west)
-//    - Zone 4: Bedroom 3 SW & Closets (starts from wall shared with Hallway, works west/south)
-// 5. Zero passing through solid walls - cuts only pass through verified grey door openings.
+// 28-Piece Plywood Underlayment Cut Catalog & Verified Irregular Polygon Sequence
+// Strictly adheres to original FloorPlan.pdf:
+// 1. ALL GREY WALL REGIONS IN THE PDF ARE THE CLOSET DOORWAYS:
+//    - Bedroom 2 Closet (Middle Closet): Doorway is on NORTH wall (grey sliding doors facing Bed 2)
+//    - Bedroom 3 North Closet (Left Closet): Doorway is on SOUTH wall (grey opening facing Bed 3)
+//    - Hallway Linen Closet: Doorway is on EAST wall (grey door facing Hallway)
+//    - Bedroom 3 South Closet: Doorway is on NORTH wall (grey opening facing Bed 3)
+//    - Master Closet: Doorway is on NORTH wall (grey sliding doors facing Primary)
+// 2. NO SHEETS PASS UNDER SOLID BLACK WALLS - cuts strictly respect framing and openings.
+// 3. NO PIECE EXCEEDS 4ft × 8ft (All pieces fit within standard physical 4x8 BCX plywood sheets).
+// 4. All closets are 100% covered with zero gaps and zero duplicate overlaps.
+// 5. Dedicated 4x8 sheet for Master Closet (8ft runner + end fill from same offcut).
 
 export const sheetLayoutData = [
   // ==========================================
@@ -180,7 +181,7 @@ export const sheetLayoutData = [
     status: 'cut',
     shapeType: 'Primary Closet 8ft Runner (from 4×8)',
     dimsText: '27.6" × 96" (2\'3.6" × 8\')',
-    cutDimensions: 'Rip a fresh 4x8 sheet lengthwise to 27.6" (2\'4") width to create full 8ft runner covering main closet floor',
+    cutDimensions: 'Rip a fresh 4x8 sheet lengthwise to 27.6" (2\'4") width to create full 8ft runner covering main closet floor through the grey sliding door opening',
     offcut: '20.4" × 96" remainder strip (used directly for Sheet #9 and Linen Closet)',
     position: 'Master Closet, main 8ft continuous span from West wall',
     polygon: [
@@ -189,7 +190,7 @@ export const sheetLayoutData = [
       [8.81, 3.49],
       [0.81, 3.49]
     ],
-    notes: 'Uses a dedicated 4x8 sheet for the Master Closet! Single 8ft piece covers 91% of the closet seamlessly.',
+    notes: 'Uses a dedicated 4x8 sheet for the Master Closet! Single 8ft piece covers 91% of the closet seamlessly through grey sliding doors.',
     staggerOffset: 'Closet unit',
     fastenersCount: 68
   },
@@ -275,21 +276,22 @@ export const sheetLayoutData = [
     dimsText: '24" × 28.3" (2\'0" × 2\'4.3")',
     cutDimensions: 'Cut 24" × 28.3" single floor plate from offcut stock',
     offcut: 'Reused stock',
-    position: 'Hallway Linen Closet Floor (Inside enclosure opening to hall)',
+    position: 'Hallway Linen Closet Floor (Enters through verified grey doorway on East wall)',
     polygon: [
       [-4.35, -3.01],
       [-2.35, -3.01],
       [-2.35, -0.65],
       [-4.35, -0.65]
     ],
-    notes: 'Dedicated piece inside linen closet. Bounded 2.0\' × 2.36\'. Hallway and linen closet 100% complete.',
+    notes: 'Dedicated piece inside linen closet. Enters through the grey door opening on the East wall. Bounded 2.0\' × 2.36\'.',
     staggerOffset: 'Closet unit',
     fastenersCount: 26
   },
 
   // ==========================================
-  // ZONE 3: BEDROOM 2 (NW) & CLOSET (Pieces 13–20)
-  // Starts from wall adjacent to Primary (X: 0.80) working west across 13'6" width
+  // ZONE 3: BEDROOM 2 (NW) & BEDROOM 2 CLOSET (MIDDLE CLOSET) (Pieces 13–21)
+  // Starts against wall shared with Primary (X: 0.80) working west across 13'6" width
+  // Note: Bedroom 2 closet is the MIDDLE closet with grey sliding doors on the NORTH wall!
   // ==========================================
   {
     id: 'sheet-13',
@@ -322,7 +324,7 @@ export const sheetLayoutData = [
     status: 'cut',
     shapeType: 'Doorway Notched Cut',
     dimsText: '48" × 16.4" max (notched)',
-    cutDimensions: 'Cross-cut length to 16.4", notch doorway extension to Z: -2.61 between X: -2.35 and 0.80 and stop at Z: -3.01 west of door',
+    cutDimensions: 'Cross-cut length to 16.4", notch doorway extension to Z: -2.61 between X: -2.35 and 0.80 through the grey doorway opening, stopping at Z: -3.01 west of door',
     offcut: '48" × 79.6" remainder (used for Sheet #16)',
     position: 'Row 1 South, completing span along Primary wall down to hallway door threshold',
     polygon: [
@@ -333,7 +335,7 @@ export const sheetLayoutData = [
       [-2.35, -3.01],
       [-3.20, -3.01]
     ],
-    notes: 'Notched around the door opening to the hallway. Stops flush at wall. Zero overlap into linen closet.',
+    notes: 'Passes cleanly through the verified grey doorway opening to the hallway. Stops flush at wall. Zero overlap into linen closet.',
     staggerOffset: '0"',
     fastenersCount: 30
   },
@@ -377,7 +379,7 @@ export const sheetLayoutData = [
       [-3.20, -3.01],
       [-7.20, -3.01]
     ],
-    notes: 'Fits within 4x8 bounds (4.0\' × 4.97\'). Stops at south wall divider with Bed 3 North closet.',
+    notes: 'Fits within 4x8 bounds (4.0\' × 4.97\'). Stops at south wall line facing the Bedroom 2 closet sliding doors.',
     staggerOffset: '48" offset',
     fastenersCount: 58
   },
@@ -421,7 +423,7 @@ export const sheetLayoutData = [
       [-7.20, -3.01],
       [-11.20, -3.01]
     ],
-    notes: 'Stops at south wall divider. Row 3 complete.',
+    notes: 'Stops at south wall line. Row 3 complete.',
     staggerOffset: '0"',
     fastenersCount: 22
   },
@@ -436,7 +438,7 @@ export const sheetLayoutData = [
     dimsText: '18.2" × 96" (1\'6.2" × 8\')',
     cutDimensions: 'Rip 4x8 sheet down to 18.2" width to complete Bedroom 2 west exterior window wall',
     offcut: '29.8" × 96" rip offcut',
-    position: 'Row 4, along West exterior window wall',
+    position: 'Row 4, along West exterior window wall (North section)',
     polygon: [
       [-12.72, -11.98],
       [-11.20, -11.98],
@@ -452,52 +454,51 @@ export const sheetLayoutData = [
     stepNumber: 20,
     sheetNumber: 20,
     zone: 'Zone 3: Bedroom 2 (NW)',
-    room: 'Bedroom 2 & Bed 2 Closet',
+    room: 'Bedroom 2 (SW Corner)',
     status: 'cut',
-    shapeType: 'Irregular L-Shape Closet Wrap',
-    dimsText: '40.2" × 40.0" max (L-shaped wrap)',
-    cutDimensions: 'Cut L-shaped sheet (3.35\' × 3.33\') covering Bedroom 2 SW corner and extending through grey opening into Bedroom 2 Closet',
-    offcut: 'Scrap from notch cut',
-    position: 'Row 4 South span + wrapping through opening into Bedroom 2 Closet',
+    shapeType: 'Cross Cut Rectangle',
+    dimsText: '18.2" × 11.6" (1\'6.2" × 0\'11.6")',
+    cutDimensions: 'Cross-cut 18.2" width to 11.6" length to complete South-West corner of Bedroom 2 up to the solid wall',
+    offcut: 'Minimal scrap',
+    position: 'Row 4 South span, stopping at solid dividing wall (Z: -3.01)',
     polygon: [
       [-12.72, -3.98],
       [-11.20, -3.98],
       [-11.20, -3.01],
-      [-9.37, -3.01],
-      [-9.37, -0.65],
-      [-12.72, -0.65]
+      [-12.72, -3.01]
     ],
-    notes: 'Fits within 4x8 sheet (3.35\' × 3.33\' <= 4x8). Massive solid piece seamlessly covers Bed 2 closet! Bed 2 is 100% complete.',
-    staggerOffset: 'Closet wrap',
-    fastenersCount: 64
+    notes: 'STRICT WALL CLEARANCE: Stops flush at Z: -3.01 against the solid black wall dividing Bedroom 2 from Bedroom 3 North closet. Does NOT penetrate solid wall!',
+    staggerOffset: '0"',
+    fastenersCount: 20
   },
-
-  // ==========================================
-  // ZONE 4: BEDROOM 3 (SW) & CLOSETS (Pieces 21–27)
-  // Starts against wall shared with Hallway (X: -2.35) working west/south
-  // ==========================================
   {
     id: 'sheet-21',
     stepNumber: 21,
     sheetNumber: 21,
-    zone: 'Zone 4: Bedroom 3 (SW)',
-    room: 'Bedroom 3 North Closet',
+    zone: 'Zone 3: Bedroom 2 (NW)',
+    room: 'Bedroom 2 Closet (Middle Closet)',
     status: 'cut',
-    shapeType: 'Bed 3 North Closet Unit Cut (from 4×8)',
+    shapeType: 'Bed 2 Closet Unit Cut (from 4×8)',
     dimsText: '60.2" × 28.3" (5\'0.2" × 2\'4.3")',
-    cutDimensions: 'Cut 60.2" × 28.3" single solid piece from a 4x8 sheet (rotated orientation: 5.02\' length fits easily on 8ft sheet)',
+    cutDimensions: 'Cut 60.2" × 28.3" solid single piece from a 4x8 sheet (rotated 5.02\' length fits on 8ft sheet) to floor the Bedroom 2 Middle Closet through the verified grey sliding doors',
     offcut: '35.8" × 48" remainder stock',
-    position: 'Bedroom 3 North Closet Floor (Inside closet enclosure opening south into Bed 3)',
+    position: 'Bedroom 2 Closet Floor (Middle closet, enters through verified grey sliding doors on North wall)',
     polygon: [
       [-9.37, -3.01],
       [-4.35, -3.01],
       [-4.35, -0.65],
       [-9.37, -0.65]
     ],
-    notes: 'Fits within 4x8 sheet (5.02\' × 2.36\'). Completely covers Bed 3 North Closet in ONE seamless piece! Zero gaps.',
+    notes: 'CORRECTED PER PDF BLUEPRINT: The middle closet is Bedroom 2\'s closet! Its doorway is the grey sliding doors on the NORTH wall. Floored in ONE continuous 5\'0" piece. Bedroom 2 is 100% complete.',
     staggerOffset: 'Closet unit',
     fastenersCount: 48
   },
+
+  // ==========================================
+  // ZONE 4: BEDROOM 3 (SW) & CLOSETS (Pieces 22–28)
+  // Starts against wall shared with Hallway (X: -2.35) working west/south
+  // Note: Bedroom 3 North closet is the LEFTMOST closet with grey opening on the SOUTH wall!
+  // ==========================================
   {
     id: 'sheet-22',
     stepNumber: 22,
@@ -529,9 +530,9 @@ export const sheetLayoutData = [
     status: 'cut',
     shapeType: 'Irregular L-Shape South Closet Wrap',
     dimsText: '58.1" × 44.0" max (L-shaped wrap)',
-    cutDimensions: 'Cut L-shaped sheet (4.84\' × 3.67\') extending through grey opening into Bedroom 3 South Closet',
+    cutDimensions: 'Cut L-shaped sheet (4.84\' × 3.67\') extending through verified grey opening on North wall into Bedroom 3 South Closet',
     offcut: 'Scrap from notch cut',
-    position: 'Row 1 South section + wrapping directly into Bedroom 3 South Closet',
+    position: 'Row 1 South section + wrapping directly into Bedroom 3 South Closet through grey opening',
     polygon: [
       [-6.35, 7.35],
       [-2.35, 7.35],
@@ -540,7 +541,7 @@ export const sheetLayoutData = [
       [-7.19, 9.12],
       [-6.35, 9.12]
     ],
-    notes: 'Fits within 4x8 sheet (4.84\' × 3.67\' <= 4x8 rotated). Irregular cut locks south-east corner and covers closet in one piece!',
+    notes: 'Passes through verified grey opening on the north wall into the south closet! Fits within 4x8 sheet (4.84\' × 3.67\').',
     staggerOffset: '0"',
     fastenersCount: 62
   },
@@ -586,7 +587,7 @@ export const sheetLayoutData = [
       [-7.19, 11.02],
       [-10.35, 11.02]
     ],
-    notes: 'Fits within 4x8 bounds (4.0\' × 3.67\'). Perfectly aligns against Sheet #23 with zero overlaps and zero gaps.',
+    notes: 'Fits within 4x8 bounds (4.0\' × 3.67\'). Aligns perfectly against Sheet #23 with zero overlaps and zero gaps.',
     staggerOffset: '48" offset',
     fastenersCount: 56
   },
@@ -630,8 +631,30 @@ export const sheetLayoutData = [
       [-10.35, 11.02],
       [-12.72, 11.02]
     ],
-    notes: 'FINAL PIECE! Completes the entire 2nd floor underlayment. 100% of all rooms and closets are fully covered with zero gaps!',
+    notes: 'Completes Bedroom 3 main room floor down to south exterior wall.',
     staggerOffset: 'Final perimeter',
     fastenersCount: 38
+  },
+  {
+    id: 'sheet-28',
+    stepNumber: 28,
+    sheetNumber: 28,
+    zone: 'Zone 4: Bedroom 3 (SW)',
+    room: 'Bedroom 3 North Closet (Left Closet)',
+    status: 'cut',
+    shapeType: 'Bed 3 North Closet Unit Cut (from 4×8)',
+    dimsText: '40.2" × 28.3" (3\'4.2" × 2\'4.3")',
+    cutDimensions: 'Cut 40.2" × 28.3" solid single piece from a 4x8 sheet to floor the leftmost closet through its verified grey doorway on the South wall',
+    offcut: 'Reused stock',
+    position: 'Bedroom 3 North Closet Floor (Leftmost closet, enters through verified grey opening on South wall)',
+    polygon: [
+      [-12.72, -3.01],
+      [-9.37, -3.01],
+      [-9.37, -0.65],
+      [-12.72, -0.65]
+    ],
+    notes: 'CORRECTED PER PDF BLUEPRINT: The leftmost closet belongs to Bedroom 3! Its doorway is on the SOUTH wall facing Bedroom 3. Its north wall is solid black drywall. FINAL PIECE! 100% of the entire 2nd floor is completely floored with zero gaps and zero overlaps.',
+    staggerOffset: 'Closet unit',
+    fastenersCount: 36
   }
 ]
