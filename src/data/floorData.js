@@ -1,5 +1,5 @@
-// Floor plan data for 2nd Floor (6 Prince David Ct, St. Catharines, ON)
-// Total default square footage matches user's measured 525 sq ft (including all closets, excluding 5PC Bath and bath closet)
+// Exact architectural floor data extracted from 6 Prince David Ct FloorPlan.pdf vector drawings
+// Total baseline equals user's measured 525 sq ft (including all closets, excluding 5PC Bath and its closet)
 
 export const initialRoomsData = [
   {
@@ -9,13 +9,13 @@ export const initialRoomsData = [
     sqft: 158,
     type: 'bedroom',
     isIncluded: true,
-    description: 'Main starting area for underlayment. Lay sheet #1 against outside wall corner.',
-    color: '#3b82f6', // blue
+    description: 'Main starting area. Sheet #1 starts in outside North-East corner directly under the red arrow marker.',
+    color: '#3b82f6',
   },
   {
     id: 'primary-closet',
     name: 'Primary Bedroom Closet',
-    dims: "7'6\" × 2'11\"",
+    dims: "8'5\" × 1'11\"",
     sqft: 22,
     type: 'closet',
     isIncluded: true,
@@ -29,17 +29,17 @@ export const initialRoomsData = [
     sqft: 121,
     type: 'bedroom',
     isIncluded: true,
-    description: 'Top-left bedroom facing front/side with window wall.',
-    color: '#10b981', // emerald
+    description: 'Top-left bedroom with west window wall.',
+    color: '#10b981',
   },
   {
     id: 'bedroom-2-closet',
     name: 'Bedroom 2 Closet',
-    dims: "5'4\" × 2'7\"",
+    dims: "3'4\" × 2'0\"",
     sqft: 14,
     type: 'closet',
     isIncluded: true,
-    description: 'South closet inside NW Bedroom.',
+    description: 'South closet inside NW Bedroom adjoining the divider wall.',
     color: '#34d399',
   },
   {
@@ -50,22 +50,32 @@ export const initialRoomsData = [
     type: 'bedroom',
     isIncluded: true,
     description: 'Bottom-left bedroom with dual closet storage.',
-    color: '#8b5cf6', // purple
+    color: '#8b5cf6',
   },
   {
     id: 'bedroom-3-closet-n',
     name: 'Bedroom 3 North Closet',
-    dims: "5'4\" × 2'7\"",
+    dims: "4'7\" × 2'0\"",
     sqft: 14,
     type: 'closet',
     isIncluded: true,
-    description: 'Upper closet adjoining Bedroom 2 divider wall.',
+    description: 'Upper closet in Bedroom 3 sharing wall with Bed 2 closet.',
     color: '#a78bfa',
+  },
+  {
+    id: 'hall-closet',
+    name: 'Hallway Linen Closet',
+    dims: "1'3\" × 2'0\"",
+    sqft: 5,
+    type: 'closet',
+    isIncluded: true,
+    description: 'Linen closet opening directly into the central hallway.',
+    color: '#f59e0b',
   },
   {
     id: 'bedroom-3-closet-s',
     name: 'Bedroom 3 South Closet',
-    dims: "5'8\" × 2'8\"",
+    dims: "4'5\" × 1'11\"",
     sqft: 15,
     type: 'closet',
     isIncluded: true,
@@ -74,13 +84,13 @@ export const initialRoomsData = [
   },
   {
     id: 'hallway',
-    name: 'Central Hallway & Stair Landing',
-    dims: "16'0\" × 5'0\" (approx)",
-    sqft: 80,
+    name: 'Central Hallway & North Entry',
+    dims: "3'2\" × 20'2\" (plus landing)",
+    sqft: 75,
     type: 'hallway',
     isIncluded: true,
-    description: 'Connects all bedrooms and leads to stair nosing transition.',
-    color: '#f59e0b', // amber
+    description: 'Connects all bedrooms and terminates at top stair nosing.',
+    color: '#d97706',
   },
   {
     id: 'bath-5pc',
@@ -95,7 +105,7 @@ export const initialRoomsData = [
   {
     id: 'bath-closet',
     name: 'Bathroom Closet (EXCLUDED)',
-    dims: "4'10\" × 4'2\"",
+    dims: "6'2\" × 2'4\"",
     sqft: 20,
     type: 'excluded',
     isIncluded: false,
@@ -104,73 +114,98 @@ export const initialRoomsData = [
   },
 ]
 
-// 3D coordinates (normalized in feet, centered around hallway/stairwell origin)
-// Room bounding boxes [minX, minZ, maxX, maxZ] (Z is depth/vertical on floor plan, X is width)
+// 3D architectural bounding boxes in feet directly converted from FloorPlan.pdf vector paths
+// Coordinates are centered around origin: (0, 0)
 export const roomBounds3D = {
   'primary': {
-    x: 1.5, z: -16.0, w: 11.5, d: 15.5,
-    labelPos: [7.25, 0.2, -8.25],
+    x: 1.19, z: -11.98, w: 11.52, d: 15.47,
+    labelPos: [6.95, 0.2, -4.24],
     name: 'Primary Bedroom',
+    dims: "11'6\" × 15'6\"",
     tag: '158 sq ft'
   },
   'primary-closet': {
-    x: 1.5, z: -0.5, w: 7.5, d: 2.8,
-    labelPos: [5.25, 0.2, 0.9],
+    x: 1.19, z: 1.58, w: 8.38, d: 1.91,
+    labelPos: [5.38, 0.2, 2.54],
     name: 'Primary Closet',
+    dims: "8'5\" × 1'11\"",
     tag: '22 sq ft'
   },
   'bedroom-2': {
-    x: -13.5, z: -16.0, w: 13.5, d: 9.0,
-    labelPos: [-6.75, 0.2, -11.5],
-    name: 'Bedroom 2',
+    x: -12.72, z: -11.98, w: 13.53, d: 8.97,
+    labelPos: [-5.96, 0.2, -7.49],
+    name: 'Bedroom 2 (NW)',
+    dims: "13'6\" × 9'0\"",
     tag: '121 sq ft'
   },
   'bedroom-2-closet': {
-    x: -13.5, z: -7.0, w: 5.4, d: 2.6,
-    labelPos: [-10.8, 0.2, -5.7],
+    x: -12.72, z: -2.62, w: 3.35, d: 1.97,
+    labelPos: [-11.05, 0.2, -1.63],
     name: 'Bed 2 Closet',
+    dims: "3'4\" × 2'0\"",
     tag: '14 sq ft'
-  },
-  'bedroom-3': {
-    x: -13.5, z: -4.4, w: 10.0, d: 11.25,
-    labelPos: [-8.5, 0.2, 1.2],
-    name: 'Bedroom 3',
-    tag: '101 sq ft'
   },
   'bedroom-3-closet-n': {
-    x: -8.1, z: -7.0, w: 5.4, d: 2.6,
-    labelPos: [-5.4, 0.2, -5.7],
+    x: -8.98, z: -2.62, w: 4.63, d: 1.97,
+    labelPos: [-6.67, 0.2, -1.63],
     name: 'Bed 3 Closet N',
+    dims: "4'7\" × 2'0\"",
     tag: '14 sq ft'
   },
+  'hall-closet': {
+    x: -3.95, z: -2.62, w: 1.21, d: 1.97,
+    labelPos: [-3.35, 0.2, -1.63],
+    name: 'Hall Linen Closet',
+    dims: "1'3\" × 2'0\"",
+    tag: '5 sq ft'
+  },
+  'bedroom-3': {
+    x: -12.72, z: -0.26, w: 9.98, d: 11.28,
+    labelPos: [-7.73, 0.2, 5.38],
+    name: 'Bedroom 3 (SW)',
+    dims: "10'0\" × 11'3\"",
+    tag: '101 sq ft'
+  },
   'bedroom-3-closet-s': {
-    x: -6.0, z: 4.25, w: 5.8, d: 2.6,
-    labelPos: [-3.1, 0.2, 5.55],
+    x: -7.19, z: 9.12, w: 4.45, d: 1.89,
+    labelPos: [-4.97, 0.2, 10.07],
     name: 'Bed 3 Closet S',
+    dims: "4'5\" × 1'11\"",
     tag: '15 sq ft'
   },
+  'hall-north': {
+    x: -2.35, z: -11.98, w: 3.16, d: 9.36,
+    labelPos: [-0.77, 0.2, -7.29],
+    name: 'Hallway North Entry',
+    dims: "3'2\" × 9'4\"",
+    tag: '30 sq ft'
+  },
   'hallway': {
-    x: -3.5, z: -7.0, w: 5.0, d: 13.85,
-    labelPos: [-1.0, 0.2, -0.1],
-    name: 'Hallway',
-    tag: '80 sq ft'
+    x: -2.35, z: -2.61, w: 3.16, d: 10.80,
+    labelPos: [-0.77, 0.2, 2.79],
+    name: 'Central Hallway',
+    dims: "3'2\" × 10'10\"",
+    tag: '45 sq ft'
+  },
+  'stairs': {
+    x: -2.35, z: 8.19, w: 3.16, d: 4.61,
+    labelPos: [-0.77, 0.2, 10.50],
+    name: 'Stairs DN',
+    dims: "3'2\" × 4'7\"",
+    tag: 'To 1st Floor'
   },
   'bath-5pc': {
-    x: 1.5, z: 2.3, w: 11.5, d: 7.1,
-    labelPos: [7.25, 0.2, 5.85],
+    x: 1.19, z: 3.89, w: 11.52, d: 7.13,
+    labelPos: [6.95, 0.2, 7.45],
     name: '5PC Bath (Excluded)',
+    dims: "11'6\" × 7'1\"",
     tag: '64 sq ft'
   },
   'bath-closet': {
-    x: 1.5, z: 9.4, w: 4.8, d: 4.2,
-    labelPos: [3.9, 0.2, 11.5],
+    x: 1.19, z: 8.68, w: 6.13, d: 2.33,
+    labelPos: [4.26, 0.2, 9.85],
     name: 'Bath Closet (Excluded)',
+    dims: "6'2\" × 2'4\"",
     tag: '20 sq ft'
-  },
-  'stairs': {
-    x: -3.5, z: 6.85, w: 5.0, d: 7.0,
-    labelPos: [-1.0, 0.2, 10.35],
-    name: 'Stairs DN',
-    tag: 'To 1st Floor'
   }
 }
