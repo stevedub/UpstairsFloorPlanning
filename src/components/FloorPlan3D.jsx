@@ -2,8 +2,24 @@ import React, { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { sheetLayoutData } from '../data/sheetLayoutData.js'
+import { lifeproofLayoutData } from '../data/lifeproofData.js'
 import { roomBounds3D } from '../data/floorData.js'
-import { Eye, Layers, Play, Pause, ChevronLeft, ChevronRight, Info, CheckCircle2, Scissors, MapPin, Image as ImageIcon, Sparkles } from 'lucide-react'
+import {
+  Eye,
+  Layers,
+  Play,
+  Pause,
+  ChevronLeft,
+  ChevronRight,
+  Info,
+  CheckCircle2,
+  Scissors,
+  MapPin,
+  Image as ImageIcon,
+  Sparkles,
+  ShieldCheck,
+  Compass
+} from 'lucide-react'
 
 export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
   const mountRef = useRef(null)
@@ -11,6 +27,11 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
   const [showWalls, setShowWalls] = useState(true)
   const [showPdfOverlay, setShowPdfOverlay] = useState(false)
   const [selectedSheet, setSelectedSheet] = useState(sheetLayoutData[0])
+
+  // LifeProof Progression State
+  const [activeLvpStep, setActiveLvpStep] = useState(1)
+  const [selectedLvpRow, setSelectedLvpRow] = useState(lifeproofLayoutData[0])
+
   const [isPlaying, setIsPlaying] = useState(false)
   const [cameraMode, setCameraMode] = useState('3d')
 
@@ -19,6 +40,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
   const controlsRef = useRef(null)
   const rendererRef = useRef(null)
   const sheetMeshesRef = useRef([])
+  const lifeproofMeshesRef = useRef([])
   const lifeproofGroupRef = useRef(null)
   const subfloorGroupRef = useRef(null)
   const plywoodGroupRef = useRef(null)
@@ -31,17 +53,27 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     let interval = null
     if (isPlaying) {
       interval = setInterval(() => {
-        setActiveStep(prev => {
-          if (prev >= sheetLayoutData.length) {
-            setIsPlaying(false)
-            return prev
-          }
-          return prev + 1
-        })
-      }, 1200)
+        if (activeLayer === 'lifeproof') {
+          setActiveLvpStep(prev => {
+            if (prev >= lifeproofLayoutData.length) {
+              setIsPlaying(false)
+              return prev
+            }
+            return prev + 1
+          })
+        } else {
+          setActiveStep(prev => {
+            if (prev >= sheetLayoutData.length) {
+              setIsPlaying(false)
+              return prev
+            }
+            return prev + 1
+          })
+        }
+      }, 1100)
     }
     return () => clearInterval(interval)
-  }, [isPlaying, setActiveStep])
+  }, [isPlaying, activeLayer, setActiveStep])
 
   // Sync selected sheet with activeStep
   useEffect(() => {
@@ -50,6 +82,26 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
       setSelectedSheet(sheet)
     }
   }, [activeStep])
+
+  // Sync selected LifeProof row with activeLvpStep
+  useEffect(() => {
+    const row = lifeproofLayoutData.find(r => r.stepNumber === activeLvpStep)
+    if (row) {
+      setSelectedLvpRow(row)
+    }
+  }, [activeLvpStep])
+
+  // Update starting pin position based on active layer
+  useEffect(() => {
+    if (!startPinGroupRef.current) return
+    if (activeLayer === 'lifeproof') {
+      // East exterior wall start: (12.71, -11.98)
+      startPinGroupRef.current.position.set(12.35, 0.1, -11.98)
+    } else {
+      // Primary outside corner: (12.71, -11.98)
+      startPinGroupRef.current.position.set(12.71, 0.1, -11.98)
+    }
+  }, [activeLayer])
 
   // Three.js Scene Setup
   useEffect(() => {
@@ -69,7 +121,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     camera.position.set(16, 26, 20)
     cameraRef.current = camera
 
-    // Renderer (No shadows to eliminate artifacts)
+    // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
     renderer.setSize(width, height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -150,28 +202,66 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
       pdfOverlayMeshRef.current = overlayMesh
     })
 
-    // 1. SUBFLOOR LAYER (1x6 diagonal slats over joists)
-    const slatMat = new THREE.MeshStandardMaterial({ color: 0x855331, roughness: 0.7 })
+    // =========================================================================
+    // 1. SUBFLOOR LAYER: EAST-WEST JOISTS & STRICTLY CLIPPED 1x6 DIAGONAL SLATS
+    // =========================================================================
+    const slatMat = new THREE.MeshStandardMaterial({ color: 0x855331, roughness: 0.72 })
     const joistMat = new THREE.MeshStandardMaterial({ color: 0x453120, roughness: 0.85 })
 
-    for (let x = -13.5; x <= 13.5; x += 1.33) {
-      const joistGeo = new THREE.BoxGeometry(0.12, 0.15, 27)
-      const joistMesh = new THREE.Mesh(joistGeo, joistMat)
-      joistMesh.position.set(x, -0.06, -0.5)
-      subfloorGroup.add(joistMesh)
+    // Joists running EAST-WEST (parallel to X axis), spaced along Z at 16" (1.33 ft) centers.
+    // Generated strictly within each room boundary with 0% exterior overhang!
+    Object.values(roomBounds3D).forEach((b) => {
+      const zStart = Math.ceil(b.z / 1.33) * 1.33
+      for (let z = zStart; z < b.z + b.d; z += 1.33) {
+        const joistGeo = new THREE.BoxGeometry(b.w - 0.05, 0.15, 0.12)
+        const joistMesh = new THREE.Mesh(joistGeo, joistMat)
+        joistMesh.position.set(b.x + b.w / 2, -0.06, z)
+        subfloorGroup.add(joistMesh)
+      }
+    })
+
+    // 1x6 Diagonal Slats at 45°: Clipped strictly inside each room rectangle!
+    // Equation: x - z = C
+    function clipLineToRect(C, xMin, xMax, zMin, zMax) {
+      const pts = []
+      // intersect x = xMin => z = xMin - C
+      const zAtXMin = xMin - C
+      if (zAtXMin >= zMin && zAtXMin <= zMax) pts.push([xMin, zAtXMin])
+      // intersect x = xMax => z = xMax - C
+      const zAtXMax = xMax - C
+      if (zAtXMax >= zMin && zAtXMax <= zMax) pts.push([xMax, zAtXMax])
+      // intersect z = zMin => x = zMin + C
+      const xAtZMin = zMin + C
+      if (xAtZMin > xMin && xAtZMin < xMax) pts.push([xAtZMin, zMin])
+      // intersect z = zMax => x = zMax + C
+      const xAtZMax = zMax + C
+      if (xAtZMax > xMin && xAtZMax < xMax) pts.push([xAtZMax, zMax])
+
+      if (pts.length === 2) {
+        const len = Math.hypot(pts[1][0] - pts[0][0], pts[1][1] - pts[0][1])
+        if (len > 0.25) return { p1: pts[0], p2: pts[1], len }
+      }
+      return null
     }
 
-    for (let offset = -30; offset <= 30; offset += 0.52) {
-      const slatGeo = new THREE.BoxGeometry(0.48, 0.03, 34)
-      const slatMesh = new THREE.Mesh(slatGeo, slatMat)
-      slatMesh.position.set(0, 0, -0.5)
-      slatMesh.rotation.y = Math.PI / 4
-      slatMesh.position.x = offset * 0.707
-      slatMesh.position.z = -offset * 0.707 - 0.5
-      subfloorGroup.add(slatMesh)
+    for (let c = -28; c <= 28; c += 0.52) { // 0.52 ft = ~6.2" spacing
+      Object.values(roomBounds3D).forEach((b) => {
+        const seg = clipLineToRect(c, b.x + 0.03, b.x + b.w - 0.03, b.z + 0.03, b.z + b.d - 0.03)
+        if (seg) {
+          const mx = (seg.p1[0] + seg.p2[0]) / 2
+          const mz = (seg.p1[1] + seg.p2[1]) / 2
+          const slatGeo = new THREE.BoxGeometry(0.44, 0.03, seg.len)
+          const slatMesh = new THREE.Mesh(slatGeo, slatMat)
+          slatMesh.position.set(mx, 0, mz)
+          slatMesh.rotation.y = Math.PI / 4
+          subfloorGroup.add(slatMesh)
+        }
+      })
     }
 
+    // =========================================================================
     // 2. PLYWOOD LAYER - IRREGULAR POLYGONS & RECTANGLES (ZERO OVERLAPS)
+    // =========================================================================
     sheetMeshesRef.current = []
     sheetLayoutData.forEach((sheet) => {
       const shape = new THREE.Shape()
@@ -209,27 +299,46 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
       sheetMeshesRef.current.push(mesh)
     })
 
-    // 3. LIFEPROOF COBBLESTONE VINYL PLANK LAYER
-    const plankMat = new THREE.MeshStandardMaterial({
-      color: 0x695e54,
-      roughness: 0.45,
-      metalness: 0.05
+    // =========================================================================
+    // 3. LIFEPROOF COBBLESTONE VINYL PLANK LAYER (INDIVIDUAL ROWS & PLANKS)
+    // =========================================================================
+    lifeproofMeshesRef.current = []
+    // Realistic multi-tone weathered oak palette for LifeProof Cobblestone Oak:
+    const toneColors = [0x827468, 0x918377, 0x75675b] // Warm Greige, Natural Taupe, Smoked Oak
+    const plankEdgeMat = new THREE.LineBasicMaterial({ color: 0x3d3229, linewidth: 1.5 })
+
+    lifeproofLayoutData.forEach((row) => {
+      const rowGroup = new THREE.Group()
+      rowGroup.userData = { lvpRow: row }
+
+      row.planks.forEach((p) => {
+        const plankGeo = new THREE.BoxGeometry(p.w - 0.02, 0.04, p.d - 0.02)
+        const toneColor = toneColors[p.tone % toneColors.length]
+        const plankMat = new THREE.MeshStandardMaterial({
+          color: toneColor,
+          roughness: 0.48,
+          metalness: 0.04
+        })
+
+        const plankMesh = new THREE.Mesh(plankGeo, plankMat)
+        plankMesh.position.set(p.x + p.w / 2, 0.08, p.z + p.d / 2)
+        plankMesh.userData = { lvpRow: row, plank: p }
+
+        // Micro-beveled dark perimeter seam
+        const edges = new THREE.EdgesGeometry(plankGeo)
+        const edgeLine = new THREE.LineSegments(edges, plankEdgeMat)
+        plankMesh.add(edgeLine)
+
+        rowGroup.add(plankMesh)
+      })
+
+      lifeproofGroup.add(rowGroup)
+      lifeproofMeshesRef.current.push(rowGroup)
     })
-    Object.entries(roomBounds3D).forEach(([roomId, b]) => {
-      if (roomId === 'bath-5pc' || roomId === 'bath-closet' || roomId === 'stairs') return
 
-      const roomPlankGeo = new THREE.BoxGeometry(b.w - 0.06, 0.05, b.d - 0.06)
-      const roomPlankMesh = new THREE.Mesh(roomPlankGeo, plankMat)
-      roomPlankMesh.position.set(b.x + b.w / 2, 0.08, b.z + b.d / 2)
-
-      const plankEdges = new THREE.EdgesGeometry(roomPlankGeo)
-      const edgeLine = new THREE.LineSegments(plankEdges, new THREE.LineBasicMaterial({ color: 0x42382f }))
-      roomPlankMesh.add(edgeLine)
-
-      lifeproofGroup.add(roomPlankMesh)
-    })
-
+    // =========================================================================
     // 4. EXCLUDED 5PC BATHROOM & BATH CLOSET (CRIMSON RED)
+    // =========================================================================
     const bathBounds = roomBounds3D['bath-5pc']
     const bathGeo = new THREE.BoxGeometry(bathBounds.w - 0.08, 0.07, bathBounds.d - 0.08)
     const bathMat = new THREE.MeshStandardMaterial({
@@ -248,136 +357,54 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     const bathCloGeo = new THREE.BoxGeometry(bathCloBounds.w - 0.08, 0.07, bathCloBounds.d - 0.08)
     const bathCloMesh = new THREE.Mesh(bathCloGeo, bathMat)
     bathCloMesh.position.set(bathCloBounds.x + bathCloBounds.w / 2, 0.05, bathCloBounds.z + bathCloBounds.d / 2)
-    const bathCloEdges = new THREE.EdgesGeometry(bathCloGeo)
-    bathCloMesh.add(new THREE.LineSegments(bathCloEdges, new THREE.LineBasicMaterial({ color: 0xb91c1c, linewidth: 2.5 })))
+    bathCloMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(bathCloGeo), new THREE.LineBasicMaterial({ color: 0xb91c1c })))
     wallsGroup.add(bathCloMesh)
 
-    // Stairs Opening ("DN") with 8 step treads
-    const stairBounds = roomBounds3D['stairs']
-    for (let i = 0; i < 8; i++) {
-      const stepD = stairBounds.d / 8
-      const stepGeo = new THREE.BoxGeometry(stairBounds.w - 0.1, 0.02, stepD)
-      const stepMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 })
-      const stepMesh = new THREE.Mesh(stepGeo, stepMat)
-      stepMesh.position.set(
-        stairBounds.x + stairBounds.w / 2,
-        -0.03 - (i * 0.06),
-        stairBounds.z + (i * stepD) + stepD / 2
-      )
-      wallsGroup.add(stepMesh)
-    }
-
-    // 5. ARCHITECTURAL WALLS & MASTER CLOSET ENCLOSURE
-    const wallMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 })
-    const interiorWallMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.8 })
-    const windowMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.1, transparent: true, opacity: 0.85 })
-
+    // =========================================================================
+    // 5. INTERIOR & EXTERIOR WALLS
+    // =========================================================================
+    const wallMat = new THREE.MeshStandardMaterial({
+      color: 0x334155,
+      roughness: 0.8,
+      metalness: 0.1,
+      transparent: true,
+      opacity: 0.88
+    })
     const wallHeight = 1.6
-    const wallThick = 0.38
+    const wallThick = 0.28
 
-    const createWallSegment = (x, z, w, d, isExterior = false) => {
+    const createWallSegment = (x, z, w, d) => {
       const geo = new THREE.BoxGeometry(w, wallHeight, d)
-      const mesh = new THREE.Mesh(geo, isExterior ? wallMat : interiorWallMat)
+      const mesh = new THREE.Mesh(geo, wallMat)
       mesh.position.set(x + w / 2, wallHeight / 2, z + d / 2)
       wallsGroup.add(mesh)
-      return mesh
     }
 
-    // Exterior Perimeter
-    createWallSegment(-13.1, -12.36, 26.2, wallThick, true) // North exterior wall
+    // Exterior Perimeter Walls
+    createWallSegment(-12.86, -12.12, 25.72, wallThick) // North
+    createWallSegment(12.71, -12.12, wallThick, 15.75)  // East
+    createWallSegment(0.81, 11.02, 12.04, wallThick)    // South East
+    createWallSegment(-12.86, 11.02, 10.65, wallThick)  // South West
+    createWallSegment(-12.86, -12.12, wallThick, 23.28) // West
 
-    // East Exterior Wall with windows
-    createWallSegment(12.71, -12.36, wallThick, 6.0, true)
-    const eastWinGeo = new THREE.BoxGeometry(wallThick + 0.05, 0.8, 4.0)
-    const eastWin = new THREE.Mesh(eastWinGeo, windowMat)
-    eastWin.position.set(12.71 + wallThick / 2, wallHeight / 2, -3.5)
-    wallsGroup.add(eastWin)
-    createWallSegment(12.71, -1.5, wallThick, 6.5, true)
-    const bathWinGeo = new THREE.BoxGeometry(wallThick + 0.05, 0.8, 2.5)
-    const bathWin = new THREE.Mesh(bathWinGeo, windowMat)
-    bathWin.position.set(12.71 + wallThick / 2, wallHeight / 2, 6.5)
-    wallsGroup.add(bathWin)
-    createWallSegment(12.71, 8.0, wallThick, 3.2, true)
-
-    // West Exterior Wall with windows
-    createWallSegment(-13.1, -12.36, wallThick, 4.0, true)
-    const b2WinGeo = new THREE.BoxGeometry(wallThick + 0.05, 0.8, 4.5)
-    const b2Win = new THREE.Mesh(b2WinGeo, windowMat)
-    b2Win.position.set(-13.1 + wallThick / 2, wallHeight / 2, -6.5)
-    wallsGroup.add(b2Win)
-    createWallSegment(-13.1, -4.0, wallThick, 6.0, true)
-    const b3WinGeo = new THREE.BoxGeometry(wallThick + 0.05, 0.8, 4.5)
-    const b3Win = new THREE.Mesh(b3WinGeo, windowMat)
-    b3Win.position.set(-13.1 + wallThick / 2, wallHeight / 2, 4.5)
-    wallsGroup.add(b3Win)
-    createWallSegment(-13.1, 7.0, wallThick, 4.2, true)
-
-    // South Exterior Walls
-    createWallSegment(-13.1, 11.02, 10.75, wallThick, true)
-    createWallSegment(-2.35, 12.8, 3.54, wallThick, true)
-    createWallSegment(0.81, 11.02, 12.28, wallThick, true)
-
-    // Interior Walls
-    // Divider between Bedroom 2 and Primary (X: 0.81, Z: -11.98 to -2.61)
-    createWallSegment(0.81, -11.98, wallThick, 9.37)
-
-    // Bedroom 2 South Wall & Bedroom 2 Closet (Middle Closet) Doorway
-    // Solid wall between Bedroom 2 and Bed 3 North Closet (Left closet)
-    createWallSegment(-13.1, -3.01, 3.73, wallThick)
-    // Bedroom 2 Closet Door Header (Middle closet sliding door opening: X: -9.37 to -4.35, Z: -3.01)
-    const b2CloHeaderGeo = new THREE.BoxGeometry(5.02, 0.35, wallThick)
-    const b2CloHeader = new THREE.Mesh(b2CloHeaderGeo, interiorWallMat)
-    b2CloHeader.position.set(-9.37 + 5.02 / 2, wallHeight - 0.175, -3.01 + wallThick / 2)
-    wallsGroup.add(b2CloHeader)
-    // Solid wall between Bedroom 2 and Linen Closet
-    createWallSegment(-4.35, -3.01, 2.00, wallThick)
-    // Bedroom 2 Entry Door Wall (leaves door opening between X: -2.35 and -0.50)
-    createWallSegment(-0.5, -2.61, 1.31, wallThick)
-
-    // Divider between Hallway and Primary Bedroom (leaves doorway into Primary)
-    createWallSegment(0.81, 0.5, wallThick, 0.69)
-
-    // MASTER CLOSET ENCLOSURE WALLS
-    createWallSegment(0.81, 1.19, 1.58, wallThick) // Left return
-    createWallSegment(7.98, 1.19, 1.59, wallThick) // Right return
-    const closetHeaderGeo = new THREE.BoxGeometry(5.59, 0.35, wallThick)
-    const closetHeader = new THREE.Mesh(closetHeaderGeo, interiorWallMat)
-    closetHeader.position.set(2.39 + 5.59 / 2, wallHeight - 0.175, 1.19 + wallThick / 2)
-    wallsGroup.add(closetHeader)
-    createWallSegment(9.57, 1.19, wallThick, 2.30) // East return wall
-    createWallSegment(0.81, 3.49, 11.9, wallThick) // South wall to 5PC Bath
-
-    // WEST CLOSETS DIVIDERS & OPENINGS (Bed 3 North Closet, Bed 2 Closet, Hall Linen)
-    createWallSegment(-9.37, -3.01, wallThick, 2.36) // Divider between Bed 3 North closet and Bed 2 closet
-    createWallSegment(-4.35, -3.01, wallThick, 2.36) // Divider between Bed 2 closet and Linen closet
-    createWallSegment(-9.37, -0.65, 5.02, wallThick) // Solid South wall of Bed 2 closet (Z: -0.65)
-    createWallSegment(-4.35, -0.65, 2.00, wallThick) // Solid South wall of Linen closet (Z: -0.65)
-
-    // Bed 3 North Closet Door Header (opening facing south into Bedroom 3 at Z: -0.65, X: -12.72 to -9.37)
-    const b3NCloHeaderGeo = new THREE.BoxGeometry(3.35, 0.35, wallThick)
-    const b3NCloHeader = new THREE.Mesh(b3NCloHeaderGeo, interiorWallMat)
-    b3NCloHeader.position.set(-12.72 + 3.35 / 2, wallHeight - 0.175, -0.65 + wallThick / 2)
-    wallsGroup.add(b3NCloHeader)
-
-    // Linen Closet Door Header (opening facing east into Hallway at X: -2.35)
-    const linenHeaderGeo = new THREE.BoxGeometry(wallThick, 0.35, 2.36)
-    const linenHeader = new THREE.Mesh(linenHeaderGeo, interiorWallMat)
-    linenHeader.position.set(-2.35 + wallThick / 2, wallHeight - 0.175, -3.01 + 2.36 / 2)
-    wallsGroup.add(linenHeader)
-
-    // Bedroom 3 / Hallway divider
-    createWallSegment(-2.35, -0.65, wallThick, 2.5)
-    createWallSegment(-2.35, 4.5, wallThick, 6.52)
-
-    // Bedroom 3 South Closet (X: -7.19 to -2.35, Z: 9.12 to 11.02)
-    createWallSegment(-7.19, 9.12, wallThick, 1.90) // Dividing wall to bedroom extension
-    const b3SCloHeaderGeo = new THREE.BoxGeometry(4.84, 0.35, wallThick)
-    const b3SCloHeader = new THREE.Mesh(b3SCloHeaderGeo, interiorWallMat)
-    b3SCloHeader.position.set(-7.19 + 4.84 / 2, wallHeight - 0.175, 9.12 + wallThick / 2)
-    wallsGroup.add(b3SCloHeader)
-
-    // Hallway / 5PC Bath divider
-    createWallSegment(0.81, 6.5, wallThick, 4.52)
+    // Solid Interior Partition Walls
+    createWallSegment(0.81, -11.98, wallThick, 11.48) // Primary / Bed 2 divider
+    createWallSegment(0.81, 1.19, 1.58, wallThick)    // Primary / closet return
+    createWallSegment(7.98, 1.19, 1.59, wallThick)    // Primary / closet east return
+    createWallSegment(9.57, 1.19, wallThick, 2.30)    // Closet East wall
+    createWallSegment(0.81, 3.49, 11.90, wallThick)   // Master Closet / 5PC Bath wall
+    createWallSegment(-12.72, -3.01, 3.35, wallThick) // Bed 2 / Bed 3 North Closet wall
+    createWallSegment(-12.72, -0.65, 3.35, wallThick) // Bed 3 North Closet south wall
+    createWallSegment(-9.37, -3.01, wallThick, 2.36)  // Closet divider wall
+    createWallSegment(-4.35, -3.01, wallThick, 2.36)  // Bed 2 closet / linen divider
+    createWallSegment(-9.37, -0.65, 5.02, wallThick)  // Bed 2 closet solid south wall
+    createWallSegment(-2.35, -3.01, wallThick, 0.40)  // Linen north return
+    createWallSegment(-2.35, -1.85, wallThick, 3.70)  // Hallway west wall
+    createWallSegment(-2.35, 4.50, wallThick, 3.69)   // Hallway south section
+    createWallSegment(-12.72, 9.12, 5.53, wallThick)  // Bed 3 south alcove return
+    createWallSegment(-7.19, 9.12, wallThick, 1.90)   // Bed 3 south closet west wall
+    createWallSegment(-2.35, 9.12, wallThick, 1.90)   // Bed 3 south closet east wall
+    createWallSegment(0.81, 6.5, wallThick, 4.52)     // Hallway east stair wall
 
     // AUTHENTIC GREY DOORWAY THRESHOLD MARKERS (1:1 with FloorPlan.pdf grey door drawings)
     const doorMat = new THREE.MeshBasicMaterial({ color: 0xdfdfdf, side: THREE.DoubleSide })
@@ -389,24 +416,16 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
       wallsGroup.add(mesh)
     }
 
-    // 1. Bedroom 2 Closet Sliding Door (Middle closet, North wall)
-    addGreyDoor(-9.37, -3.01, 5.02, wallThick)
-    // 2. Bedroom 3 North Closet Door (Left closet, South wall)
-    addGreyDoor(-12.72, -0.65, 3.35, wallThick)
-    // 3. Hallway Linen Closet Door (East wall into Hallway)
-    addGreyDoor(-2.35, -3.01, wallThick, 2.36)
-    // 4. Bedroom 3 South Closet Door (North wall into Bed 3)
-    addGreyDoor(-7.19, 9.12, 4.84, wallThick)
-    // 5. Master Closet Sliding Door (North wall into Primary)
-    addGreyDoor(2.39, 1.19, 5.59, wallThick)
-    // 6. Bedroom 2 Entry Door (from Hallway)
-    addGreyDoor(-2.35, -2.61, 1.85, wallThick)
-    // 7. Bedroom 3 Entry Door (from Hallway)
-    addGreyDoor(-2.35, 1.85, wallThick, 2.65)
-    // 8. Primary Bedroom Entry Door (from Hallway)
-    addGreyDoor(0.81, -0.50, wallThick, 1.00)
+    addGreyDoor(-9.37, -3.01, 5.02, wallThick)   // Bed 2 Closet (Middle)
+    addGreyDoor(-12.72, -0.65, 3.35, wallThick)  // Bed 3 North Closet
+    addGreyDoor(-2.35, -3.01, wallThick, 2.36)   // Hallway Linen Closet
+    addGreyDoor(-7.19, 9.12, 4.84, wallThick)    // Bed 3 South Closet
+    addGreyDoor(2.39, 1.19, 5.59, wallThick)     // Master Closet Sliding Door
+    addGreyDoor(-2.35, -2.61, 1.85, wallThick)   // Bed 2 Entry Door
+    addGreyDoor(-2.35, 1.85, wallThick, 2.65)    // Bed 3 Entry Door
+    addGreyDoor(0.81, -0.50, wallThick, 1.00)    // Primary Entry Door
 
-    // 6. EXACT STARTING ARROW PIN (Primary Outside Corner)
+    // 6. EXACT STARTING ARROW PIN
     const pinGroup = new THREE.Group()
     startPinGroupRef.current = pinGroup
 
@@ -433,7 +452,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     pinGroup.position.set(12.71, 0.1, -11.98)
     scene.add(pinGroup)
 
-    // Sheet Click Raycaster
+    // Raycaster Click Handler
     const raycaster = new THREE.Raycaster()
     const mouse = new THREE.Vector2()
 
@@ -443,13 +462,25 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
       mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
 
       raycaster.setFromCamera(mouse, camera)
-      const intersects = raycaster.intersectObjects(sheetMeshesRef.current, false)
 
-      if (intersects.length > 0) {
-        const hit = intersects[0].object
-        if (hit.userData && hit.userData.sheet) {
-          setSelectedSheet(hit.userData.sheet)
-          setActiveStep(hit.userData.sheet.stepNumber)
+      if (activeLayer === 'lifeproof') {
+        const allPlanks = lifeproofMeshesRef.current.flatMap(g => g.children.filter(c => c.isMesh))
+        const hits = raycaster.intersectObjects(allPlanks, false)
+        if (hits.length > 0) {
+          const hit = hits[0].object
+          if (hit.userData && hit.userData.lvpRow) {
+            setSelectedLvpRow(hit.userData.lvpRow)
+            setActiveLvpStep(hit.userData.lvpRow.stepNumber)
+          }
+        }
+      } else if (activeLayer === 'plywood') {
+        const intersects = raycaster.intersectObjects(sheetMeshesRef.current, false)
+        if (intersects.length > 0) {
+          const hit = intersects[0].object
+          if (hit.userData && hit.userData.sheet) {
+            setSelectedSheet(hit.userData.sheet)
+            setActiveStep(hit.userData.sheet.stepNumber)
+          }
         }
       }
     }
@@ -488,7 +519,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
       renderer.domElement.removeEventListener('pointerdown', onPointerDown)
       renderer.dispose()
     }
-  }, [])
+  }, [activeLayer])
 
   // Update Layer Visibility
   useEffect(() => {
@@ -509,7 +540,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     }
   }, [showPdfOverlay])
 
-  // Update Sheet Progression Highlight
+  // Update Plywood Sheet Progression Highlight
   useEffect(() => {
     if (!sheetMeshesRef.current || sheetMeshesRef.current.length === 0) return
 
@@ -527,7 +558,31 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
         mesh.material.color.setHex(isFull ? 0x10b981 : 0xf59e0b)
       }
     })
-  }, [activeStep])
+  }, [activeStep, activeLayer])
+
+  // Update LifeProof Row Progression Highlight
+  useEffect(() => {
+    if (!lifeproofMeshesRef.current || lifeproofMeshesRef.current.length === 0) return
+    const toneColors = [0x827468, 0x918377, 0x75675b]
+
+    lifeproofMeshesRef.current.forEach((rowGroup) => {
+      const row = rowGroup.userData.lvpRow
+      const isLaid = row.stepNumber <= activeLvpStep
+      rowGroup.visible = isLaid
+
+      const isCurrent = row.stepNumber === activeLvpStep
+      rowGroup.children.forEach((childMesh) => {
+        if (childMesh.isMesh) {
+          if (isCurrent) {
+            childMesh.material.color.setHex(0x38bdf8) // bright cyan highlight for active row
+          } else {
+            const toneIdx = childMesh.userData.plank?.tone || 0
+            childMesh.material.color.setHex(toneColors[toneIdx % toneColors.length])
+          }
+        }
+      })
+    })
+  }, [activeLvpStep, activeLayer])
 
   // Camera Presets
   const setCameraPreset = (mode) => {
@@ -566,7 +621,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
-              <span>1/2" Plywood Cuts</span>
+              <span>1/2" Plywood Cuts (28)</span>
             </button>
             <button
               onClick={() => setActiveLayer('lifeproof')}
@@ -577,7 +632,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
               }`}
             >
               <Eye className="w-3.5 h-3.5" />
-              <span>LifeProof LVP</span>
+              <span>LifeProof LVP Rows ({lifeproofLayoutData.length})</span>
             </button>
             <button
               onClick={() => setActiveLayer('subfloor')}
@@ -587,8 +642,8 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
                   : 'text-slate-300 hover:text-white'
               }`}
             >
-              <Layers className="w-3.5 h-3.5" />
-              <span>1×6 Slats</span>
+              <Compass className="w-3.5 h-3.5" />
+              <span>1×6 Slats & Joists (E-W)</span>
             </button>
           </div>
 
@@ -656,28 +711,62 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
           <div className="p-3 rounded-xl bg-slate-900/90 border border-amber-500/40 backdrop-blur-md flex items-center space-x-2 text-xs">
             <MapPin className="w-4 h-4 text-red-500 shrink-0 animate-bounce" />
             <div>
-              <div className="text-white font-bold">Start Marker: Sheet #1</div>
-              <div className="text-[10px] text-amber-400 font-mono">Primary NE Corner (under red pin)</div>
+              <div className="text-white font-bold">
+                {activeLayer === 'lifeproof' ? 'LifeProof Start: Row 1' : 'Plywood Start: Sheet #1'}
+              </div>
+              <div className="text-[10px] text-amber-400 font-mono">
+                {activeLayer === 'lifeproof' ? 'East Outside Wall (x=12.71)' : 'Primary NE Corner (under red pin)'}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Legend Overlay at Bottom Left */}
-        <div className="absolute bottom-20 left-4 z-20 pointer-events-none hidden sm:block">
+        <div className="absolute bottom-24 left-4 z-20 pointer-events-none hidden sm:block">
           <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 backdrop-blur-md space-y-1.5 text-xs">
-            <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-1">Architectural Guide</div>
-            <div className="flex items-center space-x-2">
-              <span className="w-3 h-3 rounded-sm bg-emerald-500" />
-              <span className="text-slate-300">Full 4×8 Factory Sheet</span>
+            <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-1">
+              {activeLayer === 'lifeproof' ? 'LifeProof LVP Guide' : activeLayer === 'subfloor' ? 'Subfloor Framing' : 'Architectural Guide'}
             </div>
-            <div className="flex items-center space-x-2">
-              <span className="w-3 h-3 rounded-sm bg-amber-500" />
-              <span className="text-slate-300">Irregular Cut (L-Shape / T-Notch / Wrap)</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="w-3 h-3 rounded-sm bg-sky-400" />
-              <span className="text-slate-300">Active Selected Sheet</span>
-            </div>
+
+            {activeLayer === 'lifeproof' ? (
+              <>
+                <div className="flex items-center space-x-2">
+                  <span className="w-3 h-3 rounded-sm bg-[#827468]" />
+                  <span className="text-slate-300">LifeProof Cobblestone Oak Planks</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-3 h-3 rounded-sm bg-sky-400" />
+                  <span className="text-slate-300">Active Laying Row</span>
+                </div>
+              </>
+            ) : activeLayer === 'subfloor' ? (
+              <>
+                <div className="flex items-center space-x-2">
+                  <span className="w-3 h-3 rounded-sm bg-[#453120]" />
+                  <span className="text-slate-300">East-West Floor Joists (16" OC)</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-3 h-3 rounded-sm bg-[#855331]" />
+                  <span className="text-slate-300">1×6 Diagonal Slats (Inside Walls)</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center space-x-2">
+                  <span className="w-3 h-3 rounded-sm bg-emerald-500" />
+                  <span className="text-slate-300">Full 4×8 Factory Sheet</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-3 h-3 rounded-sm bg-amber-500" />
+                  <span className="text-slate-300">Irregular Cut (L-Shape / Wrap)</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-3 h-3 rounded-sm bg-sky-400" />
+                  <span className="text-slate-300">Active Selected Sheet</span>
+                </div>
+              </>
+            )}
+
             <div className="flex items-center space-x-2">
               <span className="w-3 h-3 rounded-sm bg-red-500/70 border border-red-400" />
               <span className="text-red-400 font-bold">5PC Bath & Closet (EXCLUDED)</span>
@@ -696,61 +785,167 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
                     ? 'bg-amber-500 text-slate-950'
                     : 'bg-slate-800 hover:bg-slate-700 text-white'
                 }`}
-                title={isPlaying ? 'Pause sequence' : 'Auto-play sheet placement'}
+                title={isPlaying ? 'Pause sequence' : 'Auto-play placement progression'}
               >
                 {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
               </button>
 
               <button
-                onClick={() => setActiveStep(prev => Math.max(1, prev - 1))}
-                disabled={activeStep <= 1}
+                onClick={() => {
+                  if (activeLayer === 'lifeproof') {
+                    setActiveLvpStep(prev => Math.max(1, prev - 1))
+                  } else {
+                    setActiveStep(prev => Math.max(1, prev - 1))
+                  }
+                }}
+                disabled={activeLayer === 'lifeproof' ? activeLvpStep <= 1 : activeStep <= 1}
                 className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 transition"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
 
               <div className="text-xs font-mono">
-                <span className="text-slate-400">Sheet: </span>
-                <span className="text-amber-400 font-bold text-sm">{activeStep}</span>
-                <span className="text-slate-500"> / {sheetLayoutData.length}</span>
+                <span className="text-slate-400">{activeLayer === 'lifeproof' ? 'LVP Row: ' : 'Plywood: '}</span>
+                <span className="text-amber-400 font-bold text-sm">
+                  {activeLayer === 'lifeproof' ? activeLvpStep : activeStep}
+                </span>
+                <span className="text-slate-500">
+                  {' / '}
+                  {activeLayer === 'lifeproof' ? lifeproofLayoutData.length : sheetLayoutData.length}
+                </span>
               </div>
 
               <button
-                onClick={() => setActiveStep(prev => Math.min(sheetLayoutData.length, prev + 1))}
-                disabled={activeStep >= sheetLayoutData.length}
+                onClick={() => {
+                  if (activeLayer === 'lifeproof') {
+                    setActiveLvpStep(prev => Math.min(lifeproofLayoutData.length, prev + 1))
+                  } else {
+                    setActiveStep(prev => Math.min(sheetLayoutData.length, prev + 1))
+                  }
+                }}
+                disabled={activeLayer === 'lifeproof' ? activeLvpStep >= lifeproofLayoutData.length : activeStep >= sheetLayoutData.length}
                 className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 transition"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Slider bar */}
+            {/* Scrubber slider bar */}
             <div className="flex-1 max-w-md mx-2">
               <input
                 type="range"
                 min="1"
-                max={sheetLayoutData.length}
-                value={activeStep}
-                onChange={(e) => setActiveStep(parseInt(e.target.value))}
+                max={activeLayer === 'lifeproof' ? lifeproofLayoutData.length : sheetLayoutData.length}
+                value={activeLayer === 'lifeproof' ? activeLvpStep : activeStep}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value)
+                  if (activeLayer === 'lifeproof') {
+                    setActiveLvpStep(val)
+                  } else {
+                    setActiveStep(val)
+                  }
+                }}
                 className="w-full accent-amber-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg appearance-none"
               />
               <div className="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
-                <span>1. Primary Corner</span>
-                <span>2. Hallway</span>
-                <span>3. Bed 2 (touching Primary)</span>
-                <span>4. Bed 3 (final)</span>
+                <span>1. Primary East Wall</span>
+                <span>2. Hallway Spine</span>
+                <span>3. Bed 2 (NW)</span>
+                <span>4. Bed 3 (SW)</span>
               </div>
             </div>
 
             <div className="text-xs text-slate-300 flex items-center space-x-2">
-              <span className="hidden md:inline text-slate-400 font-mono text-[11px]">Click any sheet in 3D to inspect cut specs</span>
+              <span className="hidden md:inline text-slate-400 font-mono text-[11px]">
+                {activeLayer === 'lifeproof' ? 'Click any plank to inspect cut specs' : 'Click any sheet in 3D to inspect cut specs'}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Sheet Cut Inspector Card for Selected Sheet */}
-      {selectedSheet && (
+      {/* DYNAMIC INSPECTOR CARD */}
+      {activeLayer === 'lifeproof' && selectedLvpRow && (
+        <div className="glass-panel-glow rounded-2xl border p-6 sm:p-8 transition-all duration-300">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-mono font-black text-xl shadow-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                #{selectedLvpRow.stepNumber}
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                    Row {selectedLvpRow.rowNumber} of {lifeproofLayoutData.length}
+                  </span>
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    {selectedLvpRow.zone}
+                  </span>
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">
+                    {selectedLvpRow.plankCount} Planks in Row ({selectedLvpRow.fullPlanksCount} Full)
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold text-white mt-1">
+                  {selectedLvpRow.positionText}
+                </h3>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <div className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-right">
+                <div className="text-[10px] text-slate-500 uppercase tracking-wider font-mono">Row Width</div>
+                <div className="text-lg font-bold font-mono text-amber-400">{selectedLvpRow.widthInches}"</div>
+              </div>
+              <div className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-right">
+                <div className="text-[10px] text-slate-500 uppercase tracking-wider font-mono">Run Length</div>
+                <div className="text-lg font-bold font-mono text-emerald-400">{selectedLvpRow.totalLengthFt} ft</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5">
+              <div className="text-xs font-semibold text-amber-400 flex items-center space-x-1.5">
+                <Scissors className="w-3.5 h-3.5" />
+                <span>Starter Plank Cut (Stagger Pattern)</span>
+              </div>
+              <p className="text-sm text-slate-200 font-medium leading-relaxed">
+                {selectedLvpRow.starterCut}
+              </p>
+              <div className="text-[11px] text-slate-400 font-mono">
+                Stagger: {selectedLvpRow.staggerOffset} from previous row
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5">
+              <div className="text-xs font-semibold text-emerald-400 flex items-center space-x-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>End Plank Cut & Offcut Utilization</span>
+              </div>
+              <p className="text-sm text-slate-200 font-medium leading-relaxed">
+                {selectedLvpRow.endCut}
+              </p>
+              <div className="text-[11px] text-slate-400">
+                Keep minimum 8" length when saving end offcuts for future row starters.
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5">
+              <div className="text-xs font-semibold text-blue-400 flex items-center space-x-1.5">
+                <Info className="w-3.5 h-3.5" />
+                <span>Transition & Doorway Clearance</span>
+              </div>
+              <p className="text-sm text-slate-300 text-xs leading-relaxed">
+                <strong>Notch:</strong> {selectedLvpRow.notchInfo}
+              </p>
+              <p className="text-[11px] text-slate-400 leading-relaxed mt-1">
+                {selectedLvpRow.specialNotes}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeLayer === 'plywood' && selectedSheet && (
         <div className="glass-panel-glow rounded-2xl border p-6 sm:p-8 transition-all duration-300">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
             <div className="flex items-center space-x-4">
@@ -823,6 +1018,53 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
               </div>
               <p className="text-sm text-slate-300 text-xs leading-relaxed">
                 {selectedSheet.notes}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeLayer === 'subfloor' && (
+        <div className="glass-panel-glow rounded-2xl border p-6 sm:p-8 transition-all duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-700/20 border border-amber-600/30 flex items-center justify-center text-amber-400">
+                <Compass className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">
+                  Subfloor Framing & 1×6 Diagonal Slat Verification
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Floor joists run East-West across rooms. 1×6 slats are mathematically clipped strictly inside the house walls.
+                </p>
+              </div>
+            </div>
+            <span className="text-xs font-mono px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+              0% Exterior Overhang
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 text-xs">
+            <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800">
+              <span className="text-[10px] font-mono uppercase text-slate-500">Joist Orientation</span>
+              <div className="font-bold text-slate-200 mt-1">East-West Spanning (16" OC)</div>
+              <p className="text-slate-400 text-[11px] mt-1">
+                Joists run parallel to front exterior wall, spaced every 16 inches along Z.
+              </p>
+            </div>
+            <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800">
+              <span className="text-[10px] font-mono uppercase text-slate-500">1×6 Board Subfloor</span>
+              <div className="font-bold text-slate-200 mt-1">45° Diagonal Planks (Inside Walls)</div>
+              <p className="text-slate-400 text-[11px] mt-1">
+                Slats cross joists at 45 degrees. Clipped strictly to room perimeters.
+              </p>
+            </div>
+            <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800">
+              <span className="text-[10px] font-mono uppercase text-slate-500">Crucial Rule</span>
+              <div className="font-bold text-amber-400 mt-1">No Glue on Slat Subfloor</div>
+              <p className="text-slate-400 text-[11px] mt-1">
+                APA standard: Mechanically fasten 1/2" plywood with Paulin screws only.
               </p>
             </div>
           </div>
