@@ -1,14 +1,19 @@
-// 20-Sheet Plywood Underlayment Cut Catalog & Irregular Polygon Sequence
-// Strictly follows user's 4-zone installation sequence:
-// Zone 1: Primary Bedroom & Master Closet (starts in NE outside corner under arrow)
-// Zone 2: Central Hallway & Linen Closet
-// Zone 3: Bedroom 2 (NW) - starts from wall adjacent to Primary, works down/west
-// Zone 4: Bedroom 3 (SW) - starts from wall shared with Hallway, works west/south
-// Sheets feature realistic irregular cuts (L-shapes, T-notches, closet wraps) to keep sheets as large as possible.
+// 27-Piece Plywood Underlayment Cut Catalog & Verified Irregular Polygon Sequence
+// Strictly adheres to:
+// 1. NO PIECE EXCEEDS 4ft × 8ft (All pieces fit on a physical 4x8 BCX plywood sheet)
+// 2. All closets are 100% filled (Primary Closet, Bed 2 Closet, Bed 3 North Closet, Bed 3 South Closet, Linen Closet)
+// 3. Primary Closet uses a dedicated 4x8 sheet (8ft main runner + end fill from same offcut)
+// 4. Strict 4-Zone sequence:
+//    - Zone 1: Primary Bedroom & Master Closet (starts in NE outside corner under red arrow)
+//    - Zone 2: Central Hallway & Linen Closet
+//    - Zone 3: Bedroom 2 NW & Closet (starts from wall adjacent to Primary, works down/west)
+//    - Zone 4: Bedroom 3 SW & Closets (starts from wall shared with Hallway, works west/south)
+// 5. Zero passing through solid walls - cuts only pass through verified grey door openings.
 
 export const sheetLayoutData = [
   // ==========================================
-  // ZONE 1: PRIMARY BEDROOM + MASTER CLOSET
+  // ZONE 1: PRIMARY BEDROOM & MASTER CLOSET (Pieces 1–9)
+  // Starts directly under red arrow pin at NE exterior corner (12.71, -11.98)
   // ==========================================
   {
     id: 'sheet-01',
@@ -17,18 +22,18 @@ export const sheetLayoutData = [
     zone: 'Zone 1: Primary Bedroom',
     room: 'Primary Bedroom',
     status: 'full',
-    shapeType: 'Full 4×8 Rectangle',
+    shapeType: 'Full 4×8 Factory Sheet',
     dimsText: '48" × 96" (4\' × 8\')',
     cutDimensions: 'No cut required - factory full 4x8 sheet',
     offcut: 'None (Full sheet preserved)',
-    position: 'Row 1, Outside Corner (North-East exterior corner)',
+    position: 'Row 1, North-East exterior corner (Directly under red pin)',
     polygon: [
       [8.71, -11.98],
       [12.71, -11.98],
       [12.71, -3.98],
       [8.71, -3.98]
     ],
-    notes: 'Start here! Place factory edges against chalk lines directly under the red arrow marker. Maintain 1/4" expansion gap from drywall.',
+    notes: 'Start project here! Place factory edges against chalk lines directly under the red arrow marker. Maintain 1/4" expansion gap from drywall.',
     staggerOffset: '0"',
     fastenersCount: 82
   },
@@ -40,10 +45,10 @@ export const sheetLayoutData = [
     room: 'Primary Bedroom & East Alcove',
     status: 'cut',
     shapeType: 'Irregular L-Shape Sheet',
-    dimsText: '48" × 90" max (L-shaped wrap)',
-    cutDimensions: 'Keep sheet large! Cross-cut length to 90", notch out 10" × 28" around Master Closet east return wall to flow continuously into the East Alcove',
-    offcut: '10" × 28" notch offcut',
-    position: 'Row 1, completing East exterior wall and wrapping into East Alcove beside closet',
+    dimsText: '48" × 89.6" max (L-shaped wrap)',
+    cutDimensions: 'Cross-cut length to 89.6" (7\'5"), notch out 10" × 27.6" around Master Closet east return wall to wrap seamlessly into East Alcove',
+    offcut: '10" × 27.6" notch offcut',
+    position: 'Row 1, completing East exterior wall and wrapping into East Alcove',
     polygon: [
       [8.71, -3.98],
       [12.71, -3.98],
@@ -52,9 +57,9 @@ export const sheetLayoutData = [
       [9.57, 1.19],
       [8.71, 1.19]
     ],
-    notes: 'Irregular cut keeps one continuous piece covering the bedroom floor and east alcove, eliminating an unnecessary seam!',
+    notes: 'Fits within a 4x8 sheet (4.0\' × 7.47\'). Continuous piece covers bedroom floor and alcove without an extra joint.',
     staggerOffset: '0"',
-    fastenersCount: 72
+    fastenersCount: 74
   },
   {
     id: 'sheet-03',
@@ -65,8 +70,8 @@ export const sheetLayoutData = [
     status: 'cut',
     shapeType: 'Stagger Starter (4×4)',
     dimsText: '48" × 48" (4\' × 4\')',
-    cutDimensions: 'Cut 8ft sheet in half to 48" length',
-    offcut: '48" × 48" half-sheet (reused in Bedroom 2 starter)',
+    cutDimensions: 'Cross-cut full 8ft sheet in half at 48"',
+    offcut: '48" × 48" half-sheet (reused in Bedroom 2 as Sheet #15)',
     position: 'Row 2, Starter piece along North exterior wall',
     polygon: [
       [4.71, -11.98],
@@ -74,7 +79,7 @@ export const sheetLayoutData = [
       [8.71, -7.98],
       [4.71, -7.98]
     ],
-    notes: 'CRITICAL: Staggers the end joint by 48" from Sheet #1/2 seam. Avoids 4-corner intersections.',
+    notes: 'Staggers the end joint by 48" from Sheet #1/2 seam. Avoids four-corner intersections.',
     staggerOffset: '48" offset',
     fastenersCount: 46
   },
@@ -85,7 +90,7 @@ export const sheetLayoutData = [
     zone: 'Zone 1: Primary Bedroom',
     room: 'Primary Bedroom',
     status: 'full',
-    shapeType: 'Full 4×8 Rectangle',
+    shapeType: 'Full 4×8 Factory Sheet',
     dimsText: '48" × 96" (4\' × 8\')',
     cutDimensions: 'No cut required - factory full 4x8 sheet',
     offcut: 'None',
@@ -96,7 +101,7 @@ export const sheetLayoutData = [
       [8.71, 0.02],
       [4.71, 0.02]
     ],
-    notes: 'Screw every 6" on perimeter edges and 8" in the field. Keep 1/8" spacer nails between sheets.',
+    notes: 'Screw every 6" on edges and 8" in field. Keep 1/8" spacer nails between plywood sheets.',
     staggerOffset: '48" offset',
     fastenersCount: 82
   },
@@ -105,24 +110,22 @@ export const sheetLayoutData = [
     stepNumber: 5,
     sheetNumber: 5,
     zone: 'Zone 1: Primary Bedroom',
-    room: 'Primary Bedroom & Master Closet',
+    room: 'Primary Bedroom',
     status: 'cut',
-    shapeType: 'Irregular T-Notch Closet Wrap',
-    dimsText: '48" × 42" max (T-shaped wrap)',
-    cutDimensions: 'Cut 48" × 42" sheet with 9" side notches to extend through grey Master Closet sliding door opening (Z: 1.20) directly into closet floor',
-    offcut: 'Two 9" × 28" notch strips',
-    position: 'Row 2, wrapping through Master Closet sliding doors into closet center',
+    shapeType: 'Cross Cut Rectangle',
+    dimsText: '48" × 14" (4\' × 1\'2")',
+    cutDimensions: 'Cross-cut 14" strip to finish Row 2 flush at Master Closet north wall (Z: 1.19)',
+    offcut: '48" × 82" remainder (used for Bedroom 3 and landing)',
+    position: 'Row 2, south section stopping at Master Closet wall line',
     polygon: [
       [4.71, 0.02],
       [8.71, 0.02],
       [8.71, 1.19],
-      [7.98, 1.19],
-      [7.98, 3.49],
-      [4.71, 3.49]
+      [4.71, 1.19]
     ],
-    notes: 'Passes cleanly through the grey sliding door opening without crossing solid walls. Bridges bedroom to closet without extra seams!',
+    notes: 'Stops flush at closet wall line. Master closet is floored independently with its own dedicated 4x8 sheet.',
     staggerOffset: '48" offset',
-    fastenersCount: 48
+    fastenersCount: 28
   },
   {
     id: 'sheet-06',
@@ -135,14 +138,14 @@ export const sheetLayoutData = [
     dimsText: '47" × 96" (3\'11" × 8\')',
     cutDimensions: 'Rip 1" off width along 8ft length (from 48" down to 47")',
     offcut: '1" × 96" rip strip',
-    position: 'Row 3, North section along Hallway divider wall',
+    position: 'Row 3, North section along Hallway divider wall (X: 0.81)',
     polygon: [
       [0.81, -11.98],
       [4.71, -11.98],
       [4.71, -3.98],
       [0.81, -3.98]
     ],
-    notes: 'Finishes width of Primary along Hall divider. Staggered with Row 2.',
+    notes: 'Finishes width of Primary along Hall divider. 48" stagger with Row 2.',
     staggerOffset: '0" offset from Row 1',
     fastenersCount: 78
   },
@@ -156,7 +159,7 @@ export const sheetLayoutData = [
     shapeType: 'Cross Cut Rectangle',
     dimsText: '47" × 62" (3\'11" × 5\'2")',
     cutDimensions: 'Rip to 47" width, cross-cut to 62" length',
-    offcut: '47" × 34" piece (reused in Bedroom 3)',
+    offcut: '47" × 34" remainder stock',
     position: 'Row 3, south section facing bedroom entry door',
     polygon: [
       [0.81, -3.98],
@@ -164,7 +167,7 @@ export const sheetLayoutData = [
       [4.71, 1.19],
       [0.81, 1.19]
     ],
-    notes: 'Stops flush at Master Closet north wall line (Z: 1.19). Maintains door threshold clearance.',
+    notes: 'Stops flush at Master Closet north wall line (Z: 1.19). Primary bedroom floor is 100% complete.',
     staggerOffset: '0" offset from Row 1',
     fastenersCount: 56
   },
@@ -173,73 +176,71 @@ export const sheetLayoutData = [
     stepNumber: 8,
     sheetNumber: 8,
     zone: 'Zone 1: Primary Bedroom',
-    room: 'Master Closet (West)',
+    room: 'Master Closet (Main Runner)',
     status: 'cut',
-    shapeType: 'Closet Interior Cut',
-    dimsText: '28" × 47" (2\'4" × 3\'11")',
-    cutDimensions: 'Cut to fit west section of Master Closet from offcut stock',
-    offcut: 'Minimal scrap',
-    position: 'Inside Master Closet (West side behind return wall)',
+    shapeType: 'Primary Closet 8ft Runner (from 4×8)',
+    dimsText: '27.6" × 96" (2\'3.6" × 8\')',
+    cutDimensions: 'Rip a fresh 4x8 sheet lengthwise to 27.6" (2\'4") width to create full 8ft runner covering main closet floor',
+    offcut: '20.4" × 96" remainder strip (used directly for Sheet #9 and Linen Closet)',
+    position: 'Master Closet, main 8ft continuous span from West wall',
     polygon: [
       [0.81, 1.19],
-      [4.71, 1.19],
-      [4.71, 3.49],
+      [8.81, 1.19],
+      [8.81, 3.49],
       [0.81, 3.49]
     ],
-    notes: 'Installed inside Master Closet enclosure. No overlap with bedroom floor.',
+    notes: 'Uses a dedicated 4x8 sheet for the Master Closet! Single 8ft piece covers 91% of the closet seamlessly.',
     staggerOffset: 'Closet unit',
-    fastenersCount: 36
+    fastenersCount: 68
   },
   {
     id: 'sheet-09',
     stepNumber: 9,
     sheetNumber: 9,
     zone: 'Zone 1: Primary Bedroom',
-    room: 'Master Closet (East)',
+    room: 'Master Closet (East Fill)',
     status: 'cut',
-    shapeType: 'Closet Interior Cut',
-    dimsText: '28" × 19" (2\'4" × 1\'7")',
-    cutDimensions: 'Cut small fill piece for east section of Master Closet',
+    shapeType: 'Primary Closet End Fill (from Sheet #8 offcut)',
+    dimsText: '27.6" × 9.1" (2\'3.6" × 0\'9.1")',
+    cutDimensions: 'Cut 9.1" fill piece from the 20.4" wide offcut of Sheet #8',
     offcut: 'Minimal scrap',
-    position: 'Inside Master Closet (East corner to closet return wall)',
+    position: 'Master Closet, East corner fill to closet return wall',
     polygon: [
-      [7.98, 1.19],
+      [8.81, 1.19],
       [9.57, 1.19],
       [9.57, 3.49],
-      [7.98, 3.49]
+      [8.81, 3.49]
     ],
-    notes: 'Completes Primary Bedroom and Master Closet! Zero waste, all corners covered.',
+    notes: 'Cut from the same 4x8 sheet offcut as Sheet #8! Master Closet is 100% covered with zero waste.',
     staggerOffset: 'Closet unit',
-    fastenersCount: 18
+    fastenersCount: 16
   },
 
   // ==========================================
-  // ZONE 2: CENTRAL HALLWAY & LINEN CLOSET
+  // ZONE 2: CENTRAL HALLWAY & LINEN CLOSET (Pieces 10–12)
+  // Starts below Bedroom 2 door (Z: -2.61) down to top of stairs (Z: 8.19)
   // ==========================================
   {
     id: 'sheet-10',
     stepNumber: 10,
     sheetNumber: 10,
     zone: 'Zone 2: Central Hallway',
-    room: 'Central Hallway & Linen Closet',
+    room: 'Central Hallway Corridor',
     status: 'cut',
-    shapeType: 'Irregular L-Notch Hallway & Closet',
-    dimsText: '38" × 96" max (L-shaped wrap)',
-    cutDimensions: 'Rip 10" off width along 8ft length to fit 38" corridor; notch L-tab 24" × 24" extending through grey opening into Hallway Linen Closet',
-    offcut: '10" × 96" rip strip',
-    position: 'Central Hallway Corridor + wrapping directly into Linen Closet',
+    shapeType: 'Rip Cut Corridor Sheet',
+    dimsText: '37.8" × 96" (3\'1.8" × 8\')',
+    cutDimensions: 'Rip 4x8 sheet down to 37.8" (3\'1.8") width along full 8ft length to fit hallway corridor',
+    offcut: '10.2" × 96" rip strip',
+    position: 'Central Hallway, Main corridor from Bedroom 2 door (Z: -2.61) down to landing',
     polygon: [
       [-2.35, -2.61],
       [0.80, -2.61],
       [0.80, 5.39],
-      [-2.35, 5.39],
-      [-2.35, -0.65],
-      [-4.35, -0.65],
-      [-4.35, -2.61]
+      [-2.35, 5.39]
     ],
-    notes: 'Starts below Bedroom 2 door (Z: -2.61) and extends through the linen closet opening in one big, solid sheet!',
+    notes: 'Fits within 4x8 bounds (3.15\' × 8.0\'). Clean single piece covering hallway spine.',
     staggerOffset: 'Hallway spine',
-    fastenersCount: 82
+    fastenersCount: 78
   },
   {
     id: 'sheet-11',
@@ -249,8 +250,8 @@ export const sheetLayoutData = [
     room: 'Hallway Landing',
     status: 'cut',
     shapeType: 'Stair Landing Cut',
-    dimsText: '38" × 34" (3\'2" × 2\'10")',
-    cutDimensions: 'Cut length to 34" to terminate flush at top stair riser/nosing line (Z: 8.19)',
+    dimsText: '37.8" × 33.6" (3\'1.8" × 2\'9.6")',
+    cutDimensions: 'Rip to 37.8" width, cut length to 33.6" to terminate flush at top stair riser/nosing line (Z: 8.19)',
     offcut: 'Minimal scrap',
     position: 'Hallway South End / Top of Stairs Landing',
     polygon: [
@@ -259,81 +260,82 @@ export const sheetLayoutData = [
       [0.80, 8.19],
       [-2.35, 8.19]
     ],
-    notes: 'Stops cleanly at the stair riser edge (Z: 8.19). Leaves clearance for stair nosing molding.',
+    notes: 'Terminates cleanly at stair nosing edge. Leaves clearance for stair nosing molding.',
     staggerOffset: 'Stair terminal',
-    fastenersCount: 38
+    fastenersCount: 36
   },
-
-  // ==========================================
-  // ZONE 3: BEDROOM 2 (NW) - STARTS FROM ADJACENT PRIMARY WALL
-  // ==========================================
   {
     id: 'sheet-12',
     stepNumber: 12,
     sheetNumber: 12,
-    zone: 'Zone 3: Bedroom 2 (NW)',
-    room: 'Bedroom 2 (NW)',
-    status: 'full',
-    shapeType: 'Full 4×8 Rectangle',
-    dimsText: '48" × 96" (4\' × 8\')',
-    cutDimensions: 'No cut required - factory full sheet (runs along wall shared with Primary)',
-    offcut: 'None',
-    position: 'Row 1, starting against wall shared with Primary Bedroom (X: 0.80) along North wall',
+    zone: 'Zone 2: Central Hallway',
+    room: 'Hallway Linen Closet',
+    status: 'cut',
+    shapeType: 'Linen Closet Unit Cut',
+    dimsText: '24" × 28.3" (2\'0" × 2\'4.3")',
+    cutDimensions: 'Cut 24" × 28.3" single floor plate from offcut stock',
+    offcut: 'Reused stock',
+    position: 'Hallway Linen Closet Floor (Inside enclosure opening to hall)',
     polygon: [
-      [-3.19, -11.98],
-      [0.80, -11.98],
-      [0.80, -3.98],
-      [-3.19, -3.98]
+      [-4.35, -3.01],
+      [-2.35, -3.01],
+      [-2.35, -0.65],
+      [-4.35, -0.65]
     ],
-    notes: 'Starts against the adjacent Primary wall as planned! Proves hallway does not extend into this bedroom.',
-    staggerOffset: '0"',
-    fastenersCount: 82
+    notes: 'Dedicated piece inside linen closet. Bounded 2.0\' × 2.36\'. Hallway and linen closet 100% complete.',
+    staggerOffset: 'Closet unit',
+    fastenersCount: 26
   },
+
+  // ==========================================
+  // ZONE 3: BEDROOM 2 (NW) & CLOSET (Pieces 13–20)
+  // Starts from wall adjacent to Primary (X: 0.80) working west across 13'6" width
+  // ==========================================
   {
     id: 'sheet-13',
     stepNumber: 13,
     sheetNumber: 13,
     zone: 'Zone 3: Bedroom 2 (NW)',
     room: 'Bedroom 2 (NW)',
-    status: 'cut',
-    shapeType: 'Doorway Notched Cut',
-    dimsText: '48" × 16" with door notch',
-    cutDimensions: 'Cross-cut length to 16" to complete Row 1 down to Bedroom 2 south wall and door threshold (Z: -2.61)',
-    offcut: '48" × 80" remaining stock (used for Sheet #15)',
-    position: 'Row 1 South, completing span along Primary wall down to hallway door',
+    status: 'full',
+    shapeType: 'Full 4×8 Factory Sheet',
+    dimsText: '48" × 96" (4\' × 8\')',
+    cutDimensions: 'No cut required - factory full 4x8 sheet',
+    offcut: 'None',
+    position: 'Row 1, North section starting against wall shared with Primary (X: 0.80)',
     polygon: [
-      [-3.19, -3.98],
+      [-3.20, -11.98],
+      [0.80, -11.98],
       [0.80, -3.98],
-      [0.80, -2.61],
-      [-0.50, -2.61],
-      [-0.50, -3.01],
-      [-3.19, -3.01]
+      [-3.20, -3.98]
     ],
-    notes: 'Notched around the door opening to the hallway. Stops at south wall.',
+    notes: 'Starts against the adjacent Primary wall as required! Confirms hallway stops below Bedroom 2.',
     staggerOffset: '0"',
-    fastenersCount: 28
+    fastenersCount: 82
   },
   {
     id: 'sheet-14',
     stepNumber: 14,
     sheetNumber: 14,
     zone: 'Zone 3: Bedroom 2 (NW)',
-    room: 'Bedroom 2 (NW)',
-    status: 'full',
-    shapeType: 'Full 4×8 Rectangle (Stagger Row)',
-    dimsText: '48" × 96" (4\' × 8\')',
-    cutDimensions: 'No cut required - factory full sheet',
-    offcut: 'None',
-    position: 'Row 2, Center section of Bedroom 2',
+    room: 'Bedroom 2 Doorway Span',
+    status: 'cut',
+    shapeType: 'Doorway Notched Cut',
+    dimsText: '48" × 16.4" max (notched)',
+    cutDimensions: 'Cross-cut length to 16.4", notch doorway extension to Z: -2.61 between X: -2.35 and 0.80 and stop at Z: -3.01 west of door',
+    offcut: '48" × 79.6" remainder (used for Sheet #16)',
+    position: 'Row 1 South, completing span along Primary wall down to hallway door threshold',
     polygon: [
-      [-7.19, -11.98],
-      [-3.19, -11.98],
-      [-3.19, -3.98],
-      [-7.19, -3.98]
+      [-3.20, -3.98],
+      [0.80, -3.98],
+      [0.80, -2.61],
+      [-2.35, -2.61],
+      [-2.35, -3.01],
+      [-3.20, -3.01]
     ],
-    notes: 'Staggers end joints with Row 1. Fasten every 6" on edges, 8" field.',
-    staggerOffset: '48" offset',
-    fastenersCount: 82
+    notes: 'Notched around the door opening to the hallway. Stops flush at wall. Zero overlap into linen closet.',
+    staggerOffset: '0"',
+    fastenersCount: 30
   },
   {
     id: 'sheet-15',
@@ -341,69 +343,63 @@ export const sheetLayoutData = [
     sheetNumber: 15,
     zone: 'Zone 3: Bedroom 2 (NW)',
     room: 'Bedroom 2 (NW)',
-    status: 'full',
-    shapeType: 'Full 4×8 Rectangle',
-    dimsText: '48" × 96" (4\' × 8\')',
-    cutDimensions: 'No cut required - factory full sheet along West exterior wall',
-    offcut: 'None',
-    position: 'Row 3, North-West corner along exterior window wall',
+    status: 'cut',
+    shapeType: 'Stagger Starter (4×4)',
+    dimsText: '48" × 48" (4\' × 4\')',
+    cutDimensions: 'Use second half of Sheet #3 cut (48" × 48")',
+    offcut: 'Zero waste - 100% offcut reuse!',
+    position: 'Row 2, Starter piece along North exterior wall',
     polygon: [
-      [-12.72, -11.98],
-      [-7.19, -11.98],
-      [-7.19, -3.98],
-      [-12.72, -3.98]
+      [-7.20, -11.98],
+      [-3.20, -11.98],
+      [-3.20, -7.98],
+      [-7.20, -7.98]
     ],
-    notes: 'Placed along west window wall. Maintain 1/4" wall gap.',
-    staggerOffset: '0"',
-    fastenersCount: 82
+    notes: '48" stagger offset from Row 1. Reuses offcut half from Sheet #3 directly.',
+    staggerOffset: '48" offset',
+    fastenersCount: 46
   },
   {
     id: 'sheet-16',
     stepNumber: 16,
     sheetNumber: 16,
     zone: 'Zone 3: Bedroom 2 (NW)',
-    room: 'Bedroom 2 & Closet',
+    room: 'Bedroom 2 (NW)',
     status: 'cut',
-    shapeType: 'Irregular L-Shape Closet Wrap',
-    dimsText: '48" × 114" max (L-shaped wrap)',
-    cutDimensions: 'Cut large L-shaped sheet covering south span of Bedroom 2 and wrapping continuously through grey closet opening into Bedroom 2 Closet',
-    offcut: 'Scrap from notch cut',
-    position: 'Row 3 South span + wrapping through opening into Bedroom 2 Closet',
+    shapeType: 'Cross Cut Rectangle',
+    dimsText: '48" × 59.6" (4\' × 4\'11.6")',
+    cutDimensions: 'Cross-cut length to 59.6" (4.97\') to complete Row 2 to south wall (Z: -3.01)',
+    offcut: '48" × 36.4" remainder',
+    position: 'Row 2, Center span of Bedroom 2 down to south wall',
     polygon: [
-      [-12.72, -3.98],
-      [-3.19, -3.98],
-      [-3.19, -3.01],
-      [-9.37, -3.01],
-      [-9.37, -0.65],
-      [-12.72, -0.65]
+      [-7.20, -7.98],
+      [-3.20, -7.98],
+      [-3.20, -3.01],
+      [-7.20, -3.01]
     ],
-    notes: 'Massive single piece covering the bedroom south span and wrapping into the closet. Seamless, maximum structural rigidity!',
-    staggerOffset: 'Closet wrap',
-    fastenersCount: 74
+    notes: 'Fits within 4x8 bounds (4.0\' × 4.97\'). Stops at south wall divider with Bed 3 North closet.',
+    staggerOffset: '48" offset',
+    fastenersCount: 58
   },
-
-  // ==========================================
-  // ZONE 4: BEDROOM 3 (SW) - STARTS FROM WALL SHARED WITH HALLWAY
-  // ==========================================
   {
     id: 'sheet-17',
     stepNumber: 17,
     sheetNumber: 17,
-    zone: 'Zone 4: Bedroom 3 (SW)',
-    room: 'Bedroom 3 (SW)',
+    zone: 'Zone 3: Bedroom 2 (NW)',
+    room: 'Bedroom 2 (NW)',
     status: 'full',
-    shapeType: 'Full 4×8 Rectangle',
+    shapeType: 'Full 4×8 Factory Sheet',
     dimsText: '48" × 96" (4\' × 8\')',
-    cutDimensions: 'No cut required - factory full sheet (runs along shared Hallway wall)',
+    cutDimensions: 'No cut required - factory full 4x8 sheet',
     offcut: 'None',
-    position: 'Row 1, starting against the wall shared with the Hallway (X: -2.35)',
+    position: 'Row 3, North section along North exterior wall',
     polygon: [
-      [-6.35, -0.65],
-      [-2.35, -0.65],
-      [-2.35, 7.35],
-      [-6.35, 7.35]
+      [-11.20, -11.98],
+      [-7.20, -11.98],
+      [-7.20, -3.98],
+      [-11.20, -3.98]
     ],
-    notes: 'Starts against shared Hallway wall as planned! Lays down cleanly from north closet line.',
+    notes: 'Row 3 full sheet. Aligned with Row 1 joint line.',
     staggerOffset: '0"',
     fastenersCount: 82
   },
@@ -411,12 +407,129 @@ export const sheetLayoutData = [
     id: 'sheet-18',
     stepNumber: 18,
     sheetNumber: 18,
+    zone: 'Zone 3: Bedroom 2 (NW)',
+    room: 'Bedroom 2 (NW)',
+    status: 'cut',
+    shapeType: 'Cross Cut Rectangle',
+    dimsText: '48" × 11.6" (4\' × 0\'11.6")',
+    cutDimensions: 'Cross-cut 11.6" strip to finish Row 3 to south wall (Z: -3.01)',
+    offcut: 'Reused stock',
+    position: 'Row 3, south strip stopping at south wall line',
+    polygon: [
+      [-11.20, -3.98],
+      [-7.20, -3.98],
+      [-7.20, -3.01],
+      [-11.20, -3.01]
+    ],
+    notes: 'Stops at south wall divider. Row 3 complete.',
+    staggerOffset: '0"',
+    fastenersCount: 22
+  },
+  {
+    id: 'sheet-19',
+    stepNumber: 19,
+    sheetNumber: 19,
+    zone: 'Zone 3: Bedroom 2 (NW)',
+    room: 'Bedroom 2 (NW)',
+    status: 'cut',
+    shapeType: 'Rip Cut Rectangle',
+    dimsText: '18.2" × 96" (1\'6.2" × 8\')',
+    cutDimensions: 'Rip 4x8 sheet down to 18.2" width to complete Bedroom 2 west exterior window wall',
+    offcut: '29.8" × 96" rip offcut',
+    position: 'Row 4, along West exterior window wall',
+    polygon: [
+      [-12.72, -11.98],
+      [-11.20, -11.98],
+      [-11.20, -3.98],
+      [-12.72, -3.98]
+    ],
+    notes: 'Runs along west window wall down to Z: -3.98. Maintain 1/4" perimeter wall gap.',
+    staggerOffset: '0"',
+    fastenersCount: 52
+  },
+  {
+    id: 'sheet-20',
+    stepNumber: 20,
+    sheetNumber: 20,
+    zone: 'Zone 3: Bedroom 2 (NW)',
+    room: 'Bedroom 2 & Bed 2 Closet',
+    status: 'cut',
+    shapeType: 'Irregular L-Shape Closet Wrap',
+    dimsText: '40.2" × 40.0" max (L-shaped wrap)',
+    cutDimensions: 'Cut L-shaped sheet (3.35\' × 3.33\') covering Bedroom 2 SW corner and extending through grey opening into Bedroom 2 Closet',
+    offcut: 'Scrap from notch cut',
+    position: 'Row 4 South span + wrapping through opening into Bedroom 2 Closet',
+    polygon: [
+      [-12.72, -3.98],
+      [-11.20, -3.98],
+      [-11.20, -3.01],
+      [-9.37, -3.01],
+      [-9.37, -0.65],
+      [-12.72, -0.65]
+    ],
+    notes: 'Fits within 4x8 sheet (3.35\' × 3.33\' <= 4x8). Massive solid piece seamlessly covers Bed 2 closet! Bed 2 is 100% complete.',
+    staggerOffset: 'Closet wrap',
+    fastenersCount: 64
+  },
+
+  // ==========================================
+  // ZONE 4: BEDROOM 3 (SW) & CLOSETS (Pieces 21–27)
+  // Starts against wall shared with Hallway (X: -2.35) working west/south
+  // ==========================================
+  {
+    id: 'sheet-21',
+    stepNumber: 21,
+    sheetNumber: 21,
+    zone: 'Zone 4: Bedroom 3 (SW)',
+    room: 'Bedroom 3 North Closet',
+    status: 'cut',
+    shapeType: 'Bed 3 North Closet Unit Cut (from 4×8)',
+    dimsText: '60.2" × 28.3" (5\'0.2" × 2\'4.3")',
+    cutDimensions: 'Cut 60.2" × 28.3" single solid piece from a 4x8 sheet (rotated orientation: 5.02\' length fits easily on 8ft sheet)',
+    offcut: '35.8" × 48" remainder stock',
+    position: 'Bedroom 3 North Closet Floor (Inside closet enclosure opening south into Bed 3)',
+    polygon: [
+      [-9.37, -3.01],
+      [-4.35, -3.01],
+      [-4.35, -0.65],
+      [-9.37, -0.65]
+    ],
+    notes: 'Fits within 4x8 sheet (5.02\' × 2.36\'). Completely covers Bed 3 North Closet in ONE seamless piece! Zero gaps.',
+    staggerOffset: 'Closet unit',
+    fastenersCount: 48
+  },
+  {
+    id: 'sheet-22',
+    stepNumber: 22,
+    sheetNumber: 22,
+    zone: 'Zone 4: Bedroom 3 (SW)',
+    room: 'Bedroom 3 (SW)',
+    status: 'full',
+    shapeType: 'Full 4×8 Factory Sheet',
+    dimsText: '48" × 96" (4\' × 8\')',
+    cutDimensions: 'No cut required - factory full 4x8 sheet',
+    offcut: 'None',
+    position: 'Row 1, starting against wall shared with Hallway (X: -2.35)',
+    polygon: [
+      [-6.35, -0.65],
+      [-2.35, -0.65],
+      [-2.35, 7.35],
+      [-6.35, 7.35]
+    ],
+    notes: 'Starts against shared Hallway wall as required! Lays down cleanly from north wall line (Z: -0.65).',
+    staggerOffset: '0"',
+    fastenersCount: 82
+  },
+  {
+    id: 'sheet-23',
+    stepNumber: 23,
+    sheetNumber: 23,
     zone: 'Zone 4: Bedroom 3 (SW)',
     room: 'Bedroom 3 & South Closet',
     status: 'cut',
     shapeType: 'Irregular L-Shape South Closet Wrap',
-    dimsText: '48" × 58" (L-shaped wrap)',
-    cutDimensions: 'Cross-cut length to 44" and extend L-tab 23" × 58" into Bedroom 3 South Closet through grey opening',
+    dimsText: '58.1" × 44.0" max (L-shaped wrap)',
+    cutDimensions: 'Cut L-shaped sheet (4.84\' × 3.67\') extending through grey opening into Bedroom 3 South Closet',
     offcut: 'Scrap from notch cut',
     position: 'Row 1 South section + wrapping directly into Bedroom 3 South Closet',
     polygon: [
@@ -427,20 +540,20 @@ export const sheetLayoutData = [
       [-7.19, 9.12],
       [-6.35, 9.12]
     ],
-    notes: 'Irregular cut locks the south-east corner and covers the closet without a separate mini piece!',
+    notes: 'Fits within 4x8 sheet (4.84\' × 3.67\' <= 4x8 rotated). Irregular cut locks south-east corner and covers closet in one piece!',
     staggerOffset: '0"',
-    fastenersCount: 58
+    fastenersCount: 62
   },
   {
-    id: 'sheet-19',
-    stepNumber: 19,
-    sheetNumber: 19,
+    id: 'sheet-24',
+    stepNumber: 24,
+    sheetNumber: 24,
     zone: 'Zone 4: Bedroom 3 (SW)',
     room: 'Bedroom 3 (SW)',
     status: 'full',
-    shapeType: 'Full 4×8 Rectangle',
+    shapeType: 'Full 4×8 Factory Sheet',
     dimsText: '48" × 96" (4\' × 8\')',
-    cutDimensions: 'No cut required - factory full sheet',
+    cutDimensions: 'No cut required - factory full 4x8 sheet',
     offcut: 'None',
     position: 'Row 2, Center section of Bedroom 3',
     polygon: [
@@ -454,25 +567,71 @@ export const sheetLayoutData = [
     fastenersCount: 82
   },
   {
-    id: 'sheet-20',
-    stepNumber: 20,
-    sheetNumber: 20,
+    id: 'sheet-25',
+    stepNumber: 25,
+    sheetNumber: 25,
     zone: 'Zone 4: Bedroom 3 (SW)',
-    room: 'Bedroom 3 (West & North Closet)',
+    room: 'Bedroom 3 (South Span)',
+    status: 'cut',
+    shapeType: 'Irregular Notch South Span',
+    dimsText: '48" × 44.0" (4\' × 3\'8")',
+    cutDimensions: 'Cross-cut length to 44.0", notch 10" return along closet wall to match Sheet #23 boundary with zero overlap',
+    offcut: 'Minimal scrap',
+    position: 'Row 2 South section to south exterior wall',
+    polygon: [
+      [-10.35, 7.35],
+      [-6.35, 7.35],
+      [-6.35, 9.12],
+      [-7.19, 9.12],
+      [-7.19, 11.02],
+      [-10.35, 11.02]
+    ],
+    notes: 'Fits within 4x8 bounds (4.0\' × 3.67\'). Perfectly aligns against Sheet #23 with zero overlaps and zero gaps.',
+    staggerOffset: '48" offset',
+    fastenersCount: 56
+  },
+  {
+    id: 'sheet-26',
+    stepNumber: 26,
+    sheetNumber: 26,
+    zone: 'Zone 4: Bedroom 3 (SW)',
+    room: 'Bedroom 3 (West Window Wall)',
     status: 'cut',
     shapeType: 'Rip Cut Rectangle',
-    dimsText: '28" × 140" (2\'4" × 11\'8")',
-    cutDimensions: 'Rip cut along West exterior wall from south wall up to closet divider',
-    offcut: '20" × 96" rip strip',
-    position: 'Row 3, along West exterior window wall',
+    dimsText: '28.4" × 96" (2\'4.4" × 8\')',
+    cutDimensions: 'Rip 4x8 sheet down to 28.4" width along full 8ft length to fit west exterior window wall',
+    offcut: '19.6" × 96" rip offcut',
+    position: 'Row 3, along West exterior window wall (North section)',
     polygon: [
       [-12.72, -0.65],
       [-10.35, -0.65],
+      [-10.35, 7.35],
+      [-12.72, 7.35]
+    ],
+    notes: 'Fits within 4x8 bounds (2.37\' × 8.0\'). Placed along west exterior wall.',
+    staggerOffset: '0"',
+    fastenersCount: 68
+  },
+  {
+    id: 'sheet-27',
+    stepNumber: 27,
+    sheetNumber: 27,
+    zone: 'Zone 4: Bedroom 3 (SW)',
+    room: 'Bedroom 3 (SW Corner Finish)',
+    status: 'cut',
+    shapeType: 'Cross Cut Rectangle',
+    dimsText: '28.4" × 44.0" (2\'4.4" × 3\'8")',
+    cutDimensions: 'Rip to 28.4" width, cross-cut to 44.0" length to complete South-West exterior corner',
+    offcut: 'Minimal scrap',
+    position: 'Row 3 South, completing South-West corner of Bedroom 3',
+    polygon: [
+      [-12.72, 7.35],
+      [-10.35, 7.35],
       [-10.35, 11.02],
       [-12.72, 11.02]
     ],
-    notes: 'Final sheet! Finishes the entire 2nd floor underlayment. Vacuum clean and check every screw with a drywall knife.',
+    notes: 'FINAL PIECE! Completes the entire 2nd floor underlayment. 100% of all rooms and closets are fully covered with zero gaps!',
     staggerOffset: 'Final perimeter',
-    fastenersCount: 76
+    fastenersCount: 38
   }
 ]

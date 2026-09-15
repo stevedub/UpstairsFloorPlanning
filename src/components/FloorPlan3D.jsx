@@ -322,11 +322,19 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     createWallSegment(0.81, -11.98, wallThick, 9.37)
 
     // Bedroom 2 South Wall (stops Hallway from extending north!)
-    createWallSegment(-13.1, -2.61, 8.0, wallThick)
-    createWallSegment(-0.5, -2.61, 1.31, wallThick) // leaves doorway between -2.35 and -0.5
+    // Wall between Bedroom 2 and Bed 3 North Closet & Linen Closet
+    createWallSegment(-9.37, -3.01, 7.02, wallThick)
+    // Bed 2 Closet Door Opening Header (X: -12.72 to -9.37, Z: -3.01)
+    const b2CloHeaderGeo = new THREE.BoxGeometry(3.35, 0.35, wallThick)
+    const b2CloHeader = new THREE.Mesh(b2CloHeaderGeo, interiorWallMat)
+    b2CloHeader.position.set(-12.72 + 3.35 / 2, wallHeight - 0.175, -3.01 + wallThick / 2)
+    wallsGroup.add(b2CloHeader)
 
-    // Divider between Hallway and Primary Bedroom
-    createWallSegment(0.81, 0.5, wallThick, 0.69) // leaves doorway into Primary
+    // Bedroom 2 Entry Door Wall (leaves door opening between X: -2.35 and -0.50)
+    createWallSegment(-0.5, -2.61, 1.31, wallThick)
+
+    // Divider between Hallway and Primary Bedroom (leaves doorway into Primary)
+    createWallSegment(0.81, 0.5, wallThick, 0.69)
 
     // MASTER CLOSET ENCLOSURE WALLS
     createWallSegment(0.81, 1.19, 1.8, wallThick) // Left return
@@ -338,14 +346,34 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
     createWallSegment(9.57, 1.19, wallThick, 2.30) // East return wall
     createWallSegment(0.81, 3.49, 11.9, wallThick) // South wall to 5PC Bath
 
-    // Closets between Bedroom 2 and Bedroom 3
-    createWallSegment(-13.1, -0.65, 10.75, wallThick)
-    createWallSegment(-9.37, -2.61, wallThick, 1.96)
-    createWallSegment(-4.35, -2.61, wallThick, 1.96)
+    // WEST CLOSETS DIVIDERS & OPENINGS (Bed 2 Closet, Bed 3 North Closet, Hall Linen)
+    createWallSegment(-9.37, -3.01, wallThick, 2.36) // Divider between Bed 2 closet and Bed 3 North closet
+    createWallSegment(-4.35, -3.01, wallThick, 2.36) // Divider between Bed 3 North closet and Linen closet
+    createWallSegment(-13.1, -0.65, 3.73, wallThick) // South wall of Bed 2 closet (Z: -0.65)
+    createWallSegment(-4.35, -0.65, 2.00, wallThick) // South wall of Linen closet (Z: -0.65)
+
+    // Bed 3 North Closet Door Header (opening facing south into Bedroom 3 at Z: -0.65)
+    const b3NCloHeaderGeo = new THREE.BoxGeometry(5.02, 0.35, wallThick)
+    const b3NCloHeader = new THREE.Mesh(b3NCloHeaderGeo, interiorWallMat)
+    b3NCloHeader.position.set(-9.37 + 5.02 / 2, wallHeight - 0.175, -0.65 + wallThick / 2)
+    wallsGroup.add(b3NCloHeader)
+
+    // Linen Closet Door Header (opening facing east into Hallway at X: -2.35)
+    const linenHeaderGeo = new THREE.BoxGeometry(wallThick, 0.35, 2.36)
+    const linenHeader = new THREE.Mesh(linenHeaderGeo, interiorWallMat)
+    linenHeader.position.set(-2.35 + wallThick / 2, wallHeight - 0.175, -3.01 + 2.36 / 2)
+    wallsGroup.add(linenHeader)
 
     // Bedroom 3 / Hallway divider
     createWallSegment(-2.35, -0.65, wallThick, 2.5)
     createWallSegment(-2.35, 4.5, wallThick, 6.52)
+
+    // Bedroom 3 South Closet (X: -7.19 to -2.35, Z: 9.12 to 11.02)
+    createWallSegment(-7.19, 9.12, wallThick, 1.90) // Dividing wall to bedroom extension
+    const b3SCloHeaderGeo = new THREE.BoxGeometry(4.84, 0.35, wallThick)
+    const b3SCloHeader = new THREE.Mesh(b3SCloHeaderGeo, interiorWallMat)
+    b3SCloHeader.position.set(-7.19 + 4.84 / 2, wallHeight - 0.175, 9.12 + wallThick / 2)
+    wallsGroup.add(b3SCloHeader)
 
     // Hallway / 5PC Bath divider
     createWallSegment(0.81, 6.5, wallThick, 4.52)
@@ -708,7 +736,7 @@ export const FloorPlan3D = ({ activeStep, setActiveStep }) => {
               <div>
                 <div className="flex items-center space-x-2">
                   <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-                    Step {selectedSheet.stepNumber} of 20
+                    Step {selectedSheet.stepNumber} of {sheetLayoutData.length}
                   </span>
                   <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
                     {selectedSheet.zone}

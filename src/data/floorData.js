@@ -167,11 +167,18 @@ export const roomBounds3D = {
     tag: '5 sq ft'
   },
   'bedroom-3': {
-    x: -12.72, z: -0.65, w: 10.37, d: 11.67,
-    labelPos: [-7.54, 0.2, 5.18],
+    x: -12.72, z: -0.65, w: 10.37, d: 9.77,
+    labelPos: [-7.54, 0.2, 4.23],
     name: 'Bedroom 3 (SW)',
-    dims: "10'0\" × 11'3\"",
+    dims: "10'0\" × 9'9\"",
     tag: '101 sq ft'
+  },
+  'bedroom-3-ext': {
+    x: -12.72, z: 9.12, w: 5.53, d: 1.90,
+    labelPos: [-9.95, 0.2, 10.07],
+    name: 'Bed 3 Alcove',
+    dims: "5'6\" × 1'11\"",
+    tag: 'Window Bay'
   },
   'bedroom-3-closet-s': {
     x: -7.19, z: 9.12, w: 4.84, d: 1.90,

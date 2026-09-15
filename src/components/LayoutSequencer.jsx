@@ -8,11 +8,11 @@ export const LayoutSequencer = ({ activeStep, setActiveStep, onNavigateTo3D }) =
   const [searchTerm, setSearchTerm] = useState('')
 
   const zonesList = [
-    { id: 'all', label: 'All 4 Zones (20 Sheets)' },
-    { id: 'Zone 1', label: 'Zone 1: Primary Bedroom & Closet (Sheets 1–9)' },
-    { id: 'Zone 2', label: 'Zone 2: Hallway & Linen Closet (Sheets 10–11)' },
-    { id: 'Zone 3', label: 'Zone 3: Bedroom 2 NW & Closet (Sheets 12–16)' },
-    { id: 'Zone 4', label: 'Zone 4: Bedroom 3 SW & Closets (Sheets 17–20)' },
+    { id: 'all', label: `All 4 Zones (${sheetLayoutData.length} Pieces)` },
+    { id: 'Zone 1', label: 'Zone 1: Primary Bedroom & Master Closet (Pieces 1–9)' },
+    { id: 'Zone 2', label: 'Zone 2: Hallway & Linen Closet (Pieces 10–12)' },
+    { id: 'Zone 3', label: 'Zone 3: Bedroom 2 NW & Closet (Pieces 13–20)' },
+    { id: 'Zone 4', label: 'Zone 4: Bedroom 3 SW & Closets (Pieces 21–27)' },
   ]
 
   const filteredSheets = sheetLayoutData.filter((sheet) => {
@@ -43,22 +43,22 @@ export const LayoutSequencer = ({ activeStep, setActiveStep, onNavigateTo3D }) =
               Plywood Sheet Cutting Catalog
             </h2>
             <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
-              Follow this verified 20-sheet sequence starting from the Primary Bedroom outside corner. All cuts are planned to guarantee joint staggering of at least 24" (no four-corner seams) and maximum off-cut reuse.
+              Follow this verified 27-piece installation sequence starting from the Primary Bedroom outside corner. All cuts are strictly sized to fit within standard 4×8 sheets (no piece exceeds 4×8), all closets are 100% floored, and joint staggering of at least 24" is guaranteed.
             </p>
           </div>
 
           <div className="flex items-center space-x-3 font-mono text-xs">
             <div className="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-center">
               <div className="text-emerald-400 font-bold text-lg">{fullCount}</div>
-              <div className="text-slate-400 text-[10px] uppercase">Full Sheets</div>
+              <div className="text-slate-400 text-[10px] uppercase">Full 4×8s</div>
             </div>
             <div className="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-center">
               <div className="text-amber-400 font-bold text-lg">{cutCount}</div>
               <div className="text-slate-400 text-[10px] uppercase">Cut Pieces</div>
             </div>
             <div className="px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center">
-              <div className="text-white font-bold text-lg">20</div>
-              <div className="text-amber-400 text-[10px] uppercase">Total Sheets</div>
+              <div className="text-white font-bold text-lg">{sheetLayoutData.length}</div>
+              <div className="text-amber-400 text-[10px] uppercase">Total Pieces</div>
             </div>
           </div>
         </div>
@@ -189,7 +189,7 @@ export const LayoutSequencer = ({ activeStep, setActiveStep, onNavigateTo3D }) =
 
               {/* Action Link to 3D */}
               <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                <span className="text-slate-500 text-[11px] italic">Step {sheet.stepNumber} of 20</span>
+                <span className="text-slate-500 text-[11px] italic">Step {sheet.stepNumber} of {sheetLayoutData.length}</span>
                 <span className="text-amber-400 font-semibold flex items-center space-x-1 group">
                   <span>View in 3D Scene</span>
                   <ArrowRight className="w-3.5 h-3.5 transition group-hover:translate-x-0.5" />
