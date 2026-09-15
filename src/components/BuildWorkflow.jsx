@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { roomBuildGuides, buildWorkflowPhases } from '../data/buildStepsData.js'
 import confetti from 'canvas-confetti'
 import {
@@ -15,7 +15,9 @@ import {
   Layers,
   DoorOpen,
   Maximize2,
-  ShieldCheck
+  ShieldCheck,
+  Download,
+  Upload
 } from 'lucide-react'
 
 export const BuildWorkflow = () => {
@@ -123,6 +125,63 @@ export const BuildWorkflow = () => {
       })
       setCompletedTasks(updated)
     }
+  }
+
+  const fileInputRef = useRef(null)
+  const [backupMessage, setBackupMessage] = useState(null)
+
+  const handleExportBackup = () => {
+    try {
+      const toolsSaved = localStorage.getItem('flooring_tools_checked')
+      const backupData = {
+        exportedAt: new Date().toISOString(),
+        completedTasks,
+        checkedTools: toolsSaved ? JSON.parse(toolsSaved) : {},
+        version: 1
+      }
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backupData, null, 2))
+      const downloadAnchor = document.createElement('a')
+      downloadAnchor.setAttribute('href', dataStr)
+      downloadAnchor.setAttribute('download', `flooring-progress-backup-${new Date().toISOString().slice(0, 10)}.json`)
+      document.body.appendChild(downloadAnchor)
+      downloadAnchor.click()
+      downloadAnchor.remove()
+      setBackupMessage('Checklist progress exported to backup JSON file!')
+      setTimeout(() => setBackupMessage(null), 3500)
+    } catch (err) {
+      console.error(err)
+      alert('Failed to export backup.')
+    }
+  }
+
+  const handleImportFile = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target.result)
+        if (parsed && typeof parsed === 'object') {
+          if (parsed.completedTasks) {
+            setCompletedTasks(parsed.completedTasks)
+            localStorage.setItem('flooring_tasks_completed', JSON.stringify(parsed.completedTasks))
+          }
+          if (parsed.checkedTools) {
+            localStorage.setItem('flooring_tools_checked', JSON.stringify(parsed.checkedTools))
+          }
+          setBackupMessage('Checklist progress successfully restored from backup!')
+          setTimeout(() => setBackupMessage(null), 4000)
+        } else {
+          alert('Invalid backup file format.')
+        }
+      } catch (err) {
+        console.error(err)
+        alert('Error parsing JSON backup file.')
+      }
+    }
+    reader.readAsText(file)
+    e.target.value = ''
   }
 
   const handleResetAll = () => {
@@ -414,26 +473,65 @@ export const BuildWorkflow = () => {
               Upstairs Flooring Installation Guide
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
-              Step-by-step instructions separated into 4 distinct rooms. Check off tasks as you work upstairs. Progress is saved automatically to this device.
+              Step-by-step instructions separated into 4 distinct rooms. Check off tasks as you work upstairs. Progress persists automatically in your browser across container updates, or you can Export/Import a backup file.
             </p>
           </div>
 
-          {/* Global Progress Widget */}
-          <div className="flex items-center space-x-4 bg-slate-900/90 p-4 rounded-xl border border-slate-800">
-            <div className="text-right">
-              <div className="text-[10px] uppercase font-mono text-slate-400">Total Upstairs Completion</div>
-              <div className="text-2xl font-black font-mono text-emerald-400">{totalAllPercent}%</div>
-              <div className="text-[11px] text-slate-500 font-mono">{completedAllTasks} of {totalAllTasks} tasks done</div>
+          {/* Global Progress Widget & Backup Actions */}
+          <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
+            <div className="flex items-center space-x-2">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImportFile}
+                accept=".json"
+                className="hidden"
+              />
+              <button
+                onClick={handleExportBackup}
+                className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-600 text-slate-300 hover:text-white text-xs font-mono transition shadow-sm"
+                title="Download JSON backup file of all completed tasks & tools"
+              >
+                <Download className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Export Backup</span>
+              </button>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-600 text-slate-300 hover:text-white text-xs font-mono transition shadow-sm"
+                title="Restore progress from previously saved JSON backup file"
+              >
+                <Upload className="w-3.5 h-3.5 text-blue-400" />
+                <span>Import Backup</span>
+              </button>
             </div>
-            <button
-              onClick={handleResetAll}
-              className="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition"
-              title="Reset all tasks across all rooms"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </button>
+
+            <div className="flex items-center space-x-4 bg-slate-900/90 p-4 rounded-xl border border-slate-800">
+              <div className="text-right">
+                <div className="text-[10px] uppercase font-mono text-slate-400">Total Upstairs Completion</div>
+                <div className="text-2xl font-black font-mono text-emerald-400">{totalAllPercent}%</div>
+                <div className="text-[11px] text-slate-500 font-mono">{completedAllTasks} of {totalAllTasks} tasks done</div>
+              </div>
+              <button
+                onClick={handleResetAll}
+                className="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition"
+                title="Reset all tasks across all rooms"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Backup Status Message Banner */}
+        {backupMessage && (
+          <div className="mt-3 p-2.5 px-4 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-mono flex items-center justify-between">
+            <span className="flex items-center space-x-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>{backupMessage}</span>
+            </span>
+            <button onClick={() => setBackupMessage(null)} className="text-emerald-400 hover:text-white ml-2 text-xs">✕</button>
+          </div>
+        )}
 
         {/* Global Progress Bar */}
         <div className="mt-4 w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800">
