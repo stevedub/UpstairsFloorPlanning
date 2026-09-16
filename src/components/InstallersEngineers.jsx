@@ -73,7 +73,7 @@ export const InstallersEngineers = () => {
             </div>
             <div className="px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800 text-emerald-300 flex items-center space-x-2">
               <Award className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span>Warranty: Until Driveway</span>
+              <span>Warranty: Guaranteed Squeak-Resistant</span>
             </div>
             <div className="px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800 text-blue-300 flex items-center space-x-2">
               <Flame className="w-3.5 h-3.5 text-blue-400 shrink-0" />
