@@ -10,6 +10,7 @@ import { ToolsChecklist } from './components/ToolsChecklist.jsx'
 import { InstallersEngineers } from './components/InstallersEngineers.jsx'
 import { Footer } from './components/Footer.jsx'
 import { initialRoomsData } from './data/floorData.js'
+import { ProgressProvider } from './context/ProgressContext.jsx'
 
 export default function App() {
   const [activeSection, setActiveSection] = useState('overview')
@@ -33,8 +34,9 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
-      <Navbar
+    <ProgressProvider>
+      <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+        <Navbar
         activeSection={activeSection}
         setActiveSection={setActiveSection}
         totalSqFt={totalSqFt}
@@ -101,6 +103,7 @@ export default function App() {
       </main>
 
       <Footer />
-    </div>
+      </div>
+    </ProgressProvider>
   )
 }

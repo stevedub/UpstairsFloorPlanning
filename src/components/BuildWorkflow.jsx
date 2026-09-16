@@ -19,18 +19,11 @@ import {
   Download,
   Upload
 } from 'lucide-react'
+import { useSharedProgress } from '../context/ProgressContext.jsx'
 
 export const BuildWorkflow = () => {
   const [activeRoomId, setActiveRoomId] = useState('primary') // 'primary' | 'spare-bedroom' | 'baby-room' | 'hallway' | 'all'
-
-  const [completedTasks, setCompletedTasks] = useState(() => {
-    try {
-      const saved = localStorage.getItem('flooring_tasks_completed')
-      return saved ? JSON.parse(saved) : {}
-    } catch {
-      return {}
-    }
-  })
+  const { completedTasks, toggleTask, resetAllTasks, importTasks, syncStatus } = useSharedProgress()
 
   // State to manage expanded phases per room
   const [expandedPhases, setExpandedPhases] = useState(() => {
@@ -42,14 +35,6 @@ export const BuildWorkflow = () => {
     })
     return initial
   })
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('flooring_tasks_completed', JSON.stringify(completedTasks))
-    } catch (e) {
-      console.error(e)
-    }
-  }, [completedTasks])
 
   // Aggregate statistics across all rooms
   const allRoomTasks = roomBuildGuides.flatMap(r => r.phases.flatMap(p => p.tasks))
@@ -70,45 +55,6 @@ export const BuildWorkflow = () => {
     return { total, completed, percent, isDone }
   }
 
-  const toggleTask = (taskId, roomId, phaseNum) => {
-    const isNowDone = !completedTasks[taskId]
-    const updated = { ...completedTasks, [taskId]: isNowDone }
-    setCompletedTasks(updated)
-
-    if (isNowDone) {
-      // Check if this room is now 100% complete
-      const targetRoom = roomBuildGuides.find(r => r.id === roomId)
-      if (targetRoom) {
-        const roomTasks = targetRoom.phases.flatMap(p => p.tasks)
-        const roomAllDone = roomTasks.every(t => t.id === taskId ? true : updated[t.id])
-
-        if (roomAllDone) {
-          confetti({
-            particleCount: 120,
-            spread: 80,
-            origin: { y: 0.6 }
-          })
-          return
-        }
-      }
-
-      // Check if phase is complete
-      if (targetRoom) {
-        const phaseObj = targetRoom.phases.find(p => p.phase === phaseNum)
-        if (phaseObj) {
-          const phaseDone = phaseObj.tasks.every(t => t.id === taskId ? true : updated[t.id])
-          if (phaseDone) {
-            confetti({
-              particleCount: 60,
-              spread: 60,
-              origin: { y: 0.65 }
-            })
-          }
-        }
-      }
-    }
-  }
-
   const togglePhase = (roomKey, phaseNum) => {
     const key = `${roomKey}-${phaseNum}`
     setExpandedPhases(prev => ({ ...prev, [key]: !prev[key] }))
@@ -123,7 +69,7 @@ export const BuildWorkflow = () => {
       roomTaskIds.forEach(id => {
         delete updated[id]
       })
-      setCompletedTasks(updated)
+      importTasks(updated)
     }
   }
 
@@ -164,13 +110,9 @@ export const BuildWorkflow = () => {
         const parsed = JSON.parse(event.target.result)
         if (parsed && typeof parsed === 'object') {
           if (parsed.completedTasks) {
-            setCompletedTasks(parsed.completedTasks)
-            localStorage.setItem('flooring_tasks_completed', JSON.stringify(parsed.completedTasks))
+            importTasks(parsed.completedTasks)
           }
-          if (parsed.checkedTools) {
-            localStorage.setItem('flooring_tools_checked', JSON.stringify(parsed.checkedTools))
-          }
-          setBackupMessage('Checklist progress successfully restored from backup!')
+          setBackupMessage('Checklist progress successfully restored and saved to server!')
           setTimeout(() => setBackupMessage(null), 4000)
         } else {
           alert('Invalid backup file format.')
@@ -186,7 +128,7 @@ export const BuildWorkflow = () => {
 
   const handleResetAll = () => {
     if (window.confirm('Reset ALL checklist tasks across all 4 rooms?')) {
-      setCompletedTasks({})
+      resetAllTasks()
     }
   }
 
@@ -465,15 +407,29 @@ export const BuildWorkflow = () => {
       <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-800">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-800">
           <div>
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold mb-2">
-              <CheckSquare className="w-3.5 h-3.5" />
-              <span>Room-by-Room DIY Execution Manual</span>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+                <CheckSquare className="w-3.5 h-3.5" />
+                <span>Room-by-Room DIY Execution Manual</span>
+              </div>
+              <div className={`inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono border ${
+                syncStatus === 'saving'
+                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                  : syncStatus === 'offline'
+                  ? 'bg-slate-800 border-slate-700 text-slate-400'
+                  : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+              }`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${
+                  syncStatus === 'saving' ? 'bg-amber-400 animate-pulse' : syncStatus === 'offline' ? 'bg-slate-500' : 'bg-emerald-400'
+                }`} />
+                <span>{syncStatus === 'saving' ? 'Saving to Server...' : syncStatus === 'offline' ? 'Local Backup' : 'Shared Across All Devices'}</span>
+              </div>
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               Upstairs Flooring Installation Guide
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
-              Step-by-step instructions separated into 4 distinct rooms. Check off tasks as you work upstairs. Progress persists automatically in your browser across container updates, or you can Export/Import a backup file.
+              Step-by-step instructions separated into 4 distinct rooms. Check off tasks as you work upstairs. Progress is shared across all devices and saved continuously to the persistent server volume.
             </p>
           </div>
 

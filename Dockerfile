@@ -1,4 +1,4 @@
-# Multi-stage Dockerfile for Upstairs Flooring Web App
+# Multi-stage Dockerfile for Upstairs Flooring Web App with persistent shared progress
 
 # Stage 1: Build Vite & React static distribution
 FROM node:20-alpine AS builder
@@ -11,20 +11,29 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# Stage 2: Serve static distribution with Alpine Nginx
-FROM nginx:alpine
+# Stage 2: Production Server with persistent API storage
+FROM node:20-alpine
 
-# Remove default nginx website
-RUN rm -rf /usr/share/nginx/html/*
+WORKDIR /app
 
-# Copy built assets from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Install production dependencies only
+COPY package*.json ./
+RUN npm ci --omit=dev
 
-# Copy custom Nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy compiled static assets from builder stage
+COPY --from=builder /app/dist /app/dist
 
-# Expose HTTP port
+# Copy server scripts
+COPY server.js ./
+COPY src/server ./src/server
+
+# Create data directory for persistent volume mount
+RUN mkdir -p /app/data
+
 EXPOSE 80
 
-# Run Nginx in foreground
-CMD ["nginx", "-g", "daemon off;"]
+ENV NODE_ENV=production
+ENV PORT=80
+ENV DATA_DIR=/app/data
+
+CMD ["node", "server.js"]

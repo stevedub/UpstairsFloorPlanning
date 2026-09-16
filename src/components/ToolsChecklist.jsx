@@ -1,28 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { toolsAndSupplies } from '../data/buildStepsData.js'
 import { Wrench, CheckCircle, Circle, ShieldCheck, AlertCircle, Sparkles } from 'lucide-react'
+import { useSharedProgress } from '../context/ProgressContext.jsx'
 
 export const ToolsChecklist = () => {
-  const [checkedTools, setCheckedTools] = useState(() => {
-    try {
-      const saved = localStorage.getItem('flooring_tools_checked')
-      return saved ? JSON.parse(saved) : {}
-    } catch {
-      return {}
-    }
-  })
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('flooring_tools_checked', JSON.stringify(checkedTools))
-    } catch (e) {
-      console.error(e)
-    }
-  }, [checkedTools])
-
-  const toggleTool = (toolName) => {
-    setCheckedTools(prev => ({ ...prev, [toolName]: !prev[toolName] }))
-  }
+  const { checkedTools, toggleTool, syncStatus } = useSharedProgress()
 
   const allItems = toolsAndSupplies.flatMap(c => c.items)
   const totalItems = allItems.length
@@ -34,9 +16,23 @@ export const ToolsChecklist = () => {
       <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-800">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold mb-2">
-              <Wrench className="w-3.5 h-3.5" />
-              <span>Tool Kit & Equipment Readiness</span>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold">
+                <Wrench className="w-3.5 h-3.5" />
+                <span>Tool Kit & Equipment Readiness</span>
+              </div>
+              <div className={`inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono border ${
+                syncStatus === 'saving'
+                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                  : syncStatus === 'offline'
+                  ? 'bg-slate-800 border-slate-700 text-slate-400'
+                  : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+              }`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${
+                  syncStatus === 'saving' ? 'bg-amber-400 animate-pulse' : syncStatus === 'offline' ? 'bg-slate-500' : 'bg-emerald-400'
+                }`} />
+                <span>{syncStatus === 'saving' ? 'Saving to Server...' : syncStatus === 'offline' ? 'Local Backup' : 'Shared Across All Devices'}</span>
+              </div>
             </div>
             <h2 className="text-2xl font-bold text-white">
               Essential Tools & Supplies Checklist
