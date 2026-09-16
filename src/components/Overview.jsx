@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Home, Layers, CheckCircle2, XCircle, RotateCcw, Edit2, AlertCircle, FileText, ArrowRight, ShieldCheck } from 'lucide-react'
+import { Home, Layers, CheckCircle2, XCircle, RotateCcw, Edit2, AlertCircle, FileText, ArrowRight, ShieldCheck, HardHat } from 'lucide-react'
 
 export const Overview = ({ rooms, setRooms, totalSqFt, onNavigate }) => {
   const [editingRoomId, setEditingRoomId] = useState(null)
@@ -72,6 +72,13 @@ export const Overview = ({ rooms, setRooms, totalSqFt, onNavigate }) => {
               className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-medium text-sm border border-amber-500/30 transition"
             >
               <span>Crucial Gaps & Tolerances</span>
+            </button>
+            <button
+              onClick={() => onNavigate('engineers')}
+              className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 font-medium text-sm border border-amber-500/40 transition hover:border-amber-400"
+            >
+              <HardHat className="w-4 h-4 text-amber-400" />
+              <span>Meet The Crew</span>
             </button>
           </div>
         </div>

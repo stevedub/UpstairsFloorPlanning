@@ -1,5 +1,5 @@
 import React from 'react'
-import { Layers, DollarSign, Ruler, Compass, CheckSquare, Wrench, FileDown } from 'lucide-react'
+import { Layers, DollarSign, Ruler, Compass, CheckSquare, Wrench, FileDown, HardHat } from 'lucide-react'
 
 export const Navbar = ({ activeSection, setActiveSection, totalSqFt, plywoodCount, flooringBoxes, totalCost }) => {
   const navItems = [
@@ -10,6 +10,7 @@ export const Navbar = ({ activeSection, setActiveSection, totalSqFt, plywoodCoun
     { id: 'gaps', label: 'Gaps & Spacing', icon: Ruler },
     { id: 'workflow', label: 'Build Guide', icon: CheckSquare },
     { id: 'tools', label: 'Tools Checklist', icon: Wrench },
+    { id: 'engineers', label: 'The Engineers', icon: HardHat },
   ]
 
   return (

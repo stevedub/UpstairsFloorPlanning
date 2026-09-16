@@ -7,6 +7,7 @@ import { CostCalculator } from './components/CostCalculator.jsx'
 import { GapsGuide } from './components/GapsGuide.jsx'
 import { BuildWorkflow } from './components/BuildWorkflow.jsx'
 import { ToolsChecklist } from './components/ToolsChecklist.jsx'
+import { InstallersEngineers } from './components/InstallersEngineers.jsx'
 import { Footer } from './components/Footer.jsx'
 import { initialRoomsData } from './data/floorData.js'
 
@@ -92,6 +93,10 @@ export default function App() {
 
         {activeSection === 'tools' && (
           <ToolsChecklist />
+        )}
+
+        {activeSection === 'engineers' && (
+          <InstallersEngineers />
         )}
       </main>
 
