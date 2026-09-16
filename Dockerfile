@@ -27,13 +27,16 @@ COPY --from=builder /app/dist /app/dist
 COPY server.js ./
 COPY src/server ./src/server
 
-# Create data directory for persistent volume mount
-RUN mkdir -p /app/data
+# Create data directory and configure ownership for unprivileged node user
+RUN mkdir -p /app/data && chown -R node:node /app
 
-EXPOSE 80
+# Run as non-root user for container security
+USER node
+
+EXPOSE 8080
 
 ENV NODE_ENV=production
-ENV PORT=80
+ENV PORT=8080
 ENV DATA_DIR=/app/data
 
 CMD ["node", "server.js"]
