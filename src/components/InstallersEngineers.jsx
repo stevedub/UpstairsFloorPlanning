@@ -54,7 +54,7 @@ export const InstallersEngineers = () => {
               <HardHat className="w-3.5 h-3.5" />
               <span>Wingfelder & Son Contracting Syndicate</span>
               <span className="text-slate-500">•</span>
-              <span className="font-mono text-[11px] text-slate-300">Est. ~1998</span>
+              <span className="font-mono text-[11px] text-slate-300">Est. ~1996</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
               The Installers & Engineers
@@ -91,11 +91,11 @@ export const InstallersEngineers = () => {
               Field Archive #001
             </div>
             <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
-              <span>The Apprenticeship Begins (Circa ~1998)</span>
+              <span>The Apprenticeship Begins (Circa ~1996)</span>
             </h2>
           </div>
           <span className="text-xs font-mono px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300">
-            25+ Years of Joint Operations
+            30 Years of Joint Operations
           </span>
         </div>
 
@@ -131,14 +131,14 @@ export const InstallersEngineers = () => {
             </p>
             <p className="text-slate-400">
               Notice the backwards cap, the two-handed power drill grip, and the steady supervisory gaze of Grant ensuring
-              the screw goes in straight. Twenty-five years later, we are taking that exact same energy upstairs to tackle
+              the screw goes in straight. Thirty years later, we are taking that exact same energy upstairs to tackle
               617 sq ft of subfloor and 20 sheets of BCX fir plywood.
             </p>
 
             <div className="pt-2 border-t border-slate-800/80 grid grid-cols-2 gap-4 text-xs font-mono">
               <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
                 <div className="text-slate-500">Apprentice Age</div>
-                <div className="text-base font-bold text-amber-400">~3 Years Old</div>
+                <div className="text-base font-bold text-amber-400">~4 Years Old</div>
               </div>
               <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
                 <div className="text-slate-500">Drill RPM</div>
