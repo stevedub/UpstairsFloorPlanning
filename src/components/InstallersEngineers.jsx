@@ -161,30 +161,32 @@ export const InstallersEngineers = () => {
           <div className="glass-panel rounded-2xl border border-slate-800 overflow-hidden flex flex-col justify-between">
             <div>
               {/* Photo Banner */}
-              <div className="relative group bg-black overflow-hidden aspect-[4/3] sm:aspect-[16/10]">
+              <div className="relative group bg-slate-950 overflow-hidden h-80 sm:h-96 md:h-[440px] border-b border-slate-800">
                 <img
                   src="/dad.jpg"
                   alt="Grant Wingfelder jackhammering ceramic tile"
-                  className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  style={{ objectPosition: 'center 58%' }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent pointer-events-none" />
-                <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-slate-900/90 border border-slate-700 text-amber-400 font-mono text-xs flex items-center space-x-1">
+                <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-slate-900/90 backdrop-blur-sm border border-slate-700 text-amber-400 font-mono text-xs flex items-center space-x-1 shadow-lg">
                   <Zap className="w-3 h-3 text-amber-400" />
                   <span>Demolition Mode: Active</span>
-                </div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <span className="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-semibold">
-                    The Heavyweight Champion
-                  </span>
-                  <h3 className="text-2xl font-extrabold text-white">Grant Wingfelder</h3>
-                  <p className="text-xs text-slate-300 font-mono">
-                    Senior Vice President of Heavy Demolition & Jackhammer Operations
-                  </p>
                 </div>
               </div>
 
               {/* Bio & Details */}
               <div className="p-6 space-y-4">
+                {/* Name & Role Header */}
+                <div className="pb-3 border-b border-slate-800/80">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-semibold">
+                    The Heavyweight Champion
+                  </span>
+                  <h3 className="text-2xl font-extrabold text-white">Grant Wingfelder</h3>
+                  <p className="text-xs text-slate-300 font-mono mt-0.5">
+                    Senior Vice President of Heavy Demolition & Jackhammer Operations
+                  </p>
+                </div>
+
                 {/* Quote */}
                 <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs italic text-slate-300 flex items-start space-x-2.5">
                   <Quote className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
@@ -239,30 +241,31 @@ export const InstallersEngineers = () => {
           <div className="glass-panel rounded-2xl border border-slate-800 overflow-hidden flex flex-col justify-between">
             <div>
               {/* Photo Banner */}
-              <div className="relative group bg-black overflow-hidden aspect-[4/3] sm:aspect-[16/10]">
+              <div className="relative group bg-slate-950 overflow-hidden h-80 sm:h-96 md:h-[440px] border-b border-slate-800">
                 <img
                   src="/steven.jpg"
                   alt="Steven Wingfelder holding a menacing saw with dust mask"
-                  className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  style={{ objectPosition: 'center 32%' }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent pointer-events-none" />
-                <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-slate-900/90 border border-slate-700 text-amber-400 font-mono text-xs flex items-center space-x-1">
+                <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-slate-900/90 backdrop-blur-sm border border-slate-700 text-amber-400 font-mono text-xs flex items-center space-x-1 shadow-lg">
                   <Ruler className="w-3 h-3 text-amber-400" />
                   <span>CAD Precision: 99.9%</span>
-                </div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <span className="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-semibold">
-                    The Floor Architect
-                  </span>
-                  <h3 className="text-2xl font-extrabold text-white">Steven Wingfelder</h3>
-                  <p className="text-xs text-slate-300 font-mono">
-                    Chief Executive Floor Architect & Hand Saw Operative
-                  </p>
                 </div>
               </div>
 
               {/* Bio & Details */}
               <div className="p-6 space-y-4">
+                {/* Name & Role Header */}
+                <div className="pb-3 border-b border-slate-800/80">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-semibold">
+                    The Floor Architect
+                  </span>
+                  <h3 className="text-2xl font-extrabold text-white">Steven Wingfelder</h3>
+                  <p className="text-xs text-slate-300 font-mono mt-0.5">
+                    Chief Executive Floor Architect & Hand Saw Operative
+                  </p>
+                </div>
                 {/* Quote */}
                 <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs italic text-slate-300 flex items-start space-x-2.5">
                   <Quote className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
